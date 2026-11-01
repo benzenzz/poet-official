@@ -6,8 +6,8 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const motionVersion='poet-v3-1';
 const heroVersion='fb-49';
 const styleVersion='prototype-restoration-1';
-const editorialVersion='fb-51';
-const homeVersion='fb-51';
+const editorialVersion='fb-52';
+const homeVersion='fb-52';
 // Glue the last two words of a text block so no line ends with a single word.
 const noOrphan=html=>html.replace(/ ([^\s<>]{1,14})(<\/(?:p|li|h2|h3|h4|figcaption)>)/g,'&nbsp;$1$2');
 if(season.budget.reduce((sum,row)=>sum+row.qty*row.price,0)!==season.targetAmount)throw new Error('Season budget and target do not match.');

@@ -19,7 +19,7 @@ export const season = {
   // UI-020 (projects): plan block. Stations and the two-day schedule shown on the projects page.
   plan: {
     title: 'Kế hoạch xây dựng<br>Công viên Niềm vui',
-    lead: 'Thay vì chỉ trao quà, POET dựng một ngày hội chạy trạm ngay tại sân trường. Các em được khám phá, vui chơi an toàn và mở rộng thế giới quan.',
+    lead: 'Không chỉ mang đến những phần quà ý nghĩa, POET sẽ tổ chức một ngày hội chạy trạm ngay tại sân trường. Các em được khám phá, vui chơi an toàn và mở rộng thế giới quan.',
     stations: [
       {tone: 'coral', icon: 'briefcase', name: 'Trạm hướng nghiệp & thực tế',
        text: 'Giới thiệu và hướng dẫn các em tìm hiểu về các nhóm ngành nghề trong xã hội qua bài giảng sinh động kết hợp thực hành trực tiếp.'},
@@ -54,7 +54,7 @@ export const season = {
   summary: 'Cùng tạo thêm không gian vui chơi, vận động và học hỏi cho 300 em học sinh tại điểm trường thuộc Trường Tiểu học & Trung học cơ sở Hoàng Văn Thụ, xã Ea Kiết, tỉnh Đắk Lắk.',
   narrative: [
     'Sau một thời gian chuẩn bị cho mùa hoạt động mới, POET chính thức lựa chọn Điểm trường thuộc Trường Tiểu học & Trung học cơ sở Hoàng Văn Thụ, xã Ea Kiết, tỉnh Đắk Lắk làm điểm đến cho mùa POET 2026–2027.',
-    'Cũng qua chuyến tiền trạm ấy, POET nhận ra rằng không gian để các em vui chơi, vận động, khám phá và học hỏi vẫn còn khá hạn chế. Vì vậy, POET dự định tổ chức “Công viên niềm vui” tại điểm trường — các góc vui chơi, trải nghiệm và vận động; đồng thời cải thiện không gian sinh hoạt tại trường, để mỗi ngày đến trường của các em có thêm nhiều niềm vui và những kỷ niệm đáng nhớ.',
+    'Cũng qua chuyến tiền trạm ấy, POET nhận ra rằng điều kiện cơ sở vật chất, không gian để các em vui chơi, vận động vẫn còn khá hạn chế. Vì vậy, POET dự định tổ chức “Công viên niềm vui” tại điểm trường — các góc vui chơi, trải nghiệm và vận động; đồng thời cải thiện không gian sinh hoạt tại trường, để mỗi ngày đến trường của các em có thêm nhiều niềm vui và những kỷ niệm đáng nhớ.',
     'Hành trình gây quỹ của POET được xây dựng qua chuỗi hoạt động xuyên suốt, bao gồm quỹ Big Joy Little Joy, bộ sưu tập Young Joy Collection, không gian trải nghiệm Big Joy Pop-up (dự kiến diễn ra vào cuối tháng 12), cùng các chương trình kêu gọi tài trợ và quyên góp từ cộng đồng. Khép lại chuỗi sự kiện gây quỹ, POET sẽ thực hiện chuyến đi thực tế Final Trip đến điểm trường để trực tiếp trao tặng những món quà ý nghĩa và cùng các em nhỏ hòa mình vào các hoạt động giao lưu đầy thú vị tại sân chơi.'
   ],
   destinationPhotos: [], // Add only approved, identified Mùa 6 school photos.
@@ -86,7 +86,7 @@ export const campaignStory = {
   eyebrow: 'Điểm trường Ea Kiết · Đắk Lắk',
   intro: [
     `Bước vào mùa hoạt động mới, **POET 2026 - 2027** chính thức chọn dừng chân tại **Điểm trường thuộc ${season.school}, xã Ea Kiết, tỉnh Đắk Lắk**.`,
-    'Nhận thấy rằng không gian để các em vui chơi, vận động, khám phá và học hỏi vẫn còn khá hạn chế, POET khởi động hoạt động gây quỹ đầu tiên mang tên **Big Joy Little Joy**. Hành trình gây quỹ của POET được xây dựng qua chuỗi hoạt động xuyên suốt (Tháng 10/2026 - Tháng 01/2027) bao gồm:'
+    'Nhận thấy rằng điều kiện cơ sở vật chất, không gian để các em vui chơi, vận động vẫn còn khá hạn chế, POET khởi động hoạt động gây quỹ đầu tiên mang tên **Big Joy Little Joy**. Hành trình gây quỹ của POET được xây dựng qua chuỗi hoạt động xuyên suốt (Tháng 10/2026 - Tháng 01/2027) bao gồm:'
   ],
   activities: [
     'Quỹ **Big Joy Little Joy**',
@@ -250,7 +250,7 @@ export const sponsorIntro = {
 };
 export const contactIntro = {
   eyebrow: 'Liên hệ trực tiếp',
-  title: 'POET <span>nghe bạn.</span>',
+  title: 'Đồng hành <span>cùng POET</span>',
   text: 'Chia sẻ ý tưởng, sản phẩm hoặc cách bạn muốn đồng hành. Ban Đối ngoại sẽ phản hồi và cùng bạn chọn phương án phù hợp.',
   formTitle: 'Gửi lời nhắn kết nối',
   formText: 'Xem lại bản nháp trước khi gửi. POET chỉ nhận khi bạn chủ động gửi email.',
