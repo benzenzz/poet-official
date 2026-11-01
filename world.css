@@ -316,3 +316,23 @@ html[data-hero-transition] .hero--world .tile-piano-controls{visibility:hidden}
 .hero--world .school-porch-top,.hero--world .school-porch-side{fill:#e1d6c3}
 
 .hero--world .flower-character .object-hit{cursor:inherit;touch-action:none}
+
+
+/* Stalls: hover/focus pops the booth and shows a speech bubble. POET Community links to the message wall and also changes colour; the two coming-soon stalls only tease. */
+.hero--world .stall-link, .hero--world .stall-tease { cursor: pointer; outline: none; }
+.hero--world .stall-pop .object-hover { transition: transform 320ms cubic-bezier(.34,1.56,.64,1); }
+.hero--world .stall-bubble { opacity: 0; transform: translateY(8px) scale(.85); transform-box: view-box; transition: opacity 180ms ease, transform 320ms cubic-bezier(.34,1.56,.64,1); pointer-events: none; }
+.hero--world .stall-bubble-shape { fill: #fffaf0; stroke: #3c9e77; stroke-width: 2.5; stroke-linejoin: round; filter: drop-shadow(0 4px 0 rgba(34,92,70,.14)); }
+.hero--world .stall-bubble-text { font: 700 19px var(--font-board); fill: #225c46; }
+.hero--world .stall-pop--link .stall-bubble-shape { fill: #fee161; }
+.hero--world :is(.stall-link, .stall-tease):is(:hover, :focus-visible, :active) .stall-bubble,
+.hero--world .stall-tease:focus .stall-bubble { opacity: 1; transform: none; }
+.hero--world :is(.stall-link, .stall-tease):is(:hover, :focus-visible, :active) .object-hover,
+.hero--world .stall-tease:focus .object-hover { transform: translateY(-10px) scale(1.05); }
+.hero--world .stall-link:is(:hover, :focus-visible, :active) { --booth-yellow: #8fd4b5; --booth-color: #8fd4b5; }
+.hero--world .stall-link:focus-visible .object-art, .hero--world .stall-tease:focus-visible .object-art { filter: drop-shadow(0 0 0 #225c46) drop-shadow(0 0 3px #225c46); }
+.intro-pending :is(.stall-link, .stall-tease), .world-building :is(.stall-link, .stall-tease), html[data-hero-transition] :is(.stall-link, .stall-tease) { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) {
+  .hero--world .stall-pop .object-hover, .hero--world .stall-bubble { transition: opacity 120ms linear; }
+  .hero--world :is(.stall-link, .stall-tease):is(:hover, :focus-visible, :active, :focus) :is(.object-hover, .stall-bubble) { transform: none; }
+}
