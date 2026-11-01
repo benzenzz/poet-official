@@ -7,11 +7,11 @@ workers_dev = true
 [[d1_databases]]
 binding = "DB"
 database_name = "poet-donations"
-database_id = "824e865d-428f-4fe2-aa68-a097809ba78c"
+database_id = "d241300e-3e62-4c6a-8852-429c276b0e64"
 
 [vars]
 # Comma-separated browser origins allowed to call /api/* (no trailing slash).
-ALLOWED_ORIGIN = "https://maiphh.github.io,https://benzenzz.github.io,https://poet-official.vercel.app"
+ALLOWED_ORIGIN = "https://www.poetnpo.site,https://poetnpo.site,https://maiphh.github.io,https://benzenzz.github.io,https://poet-official.vercel.app"
 # Dev convenience: let the static preview (127.0.0.1/localhost, any port) call
 # the live API from the browser. Public read data + rate-limited POST only.
 ALLOW_LOCALHOST_ORIGINS = "1"

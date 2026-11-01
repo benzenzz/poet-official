@@ -38,7 +38,7 @@ const calls = [];
 
 function adminRoutes(page, { failPatchOnce = false } = {}) {
   let patchFailed = false;
-  return page.route('**poet-donations.lucasmai.workers.dev/**', async (route) => {
+  return page.route('**poet-donations.poetnpo.workers.dev/**', async (route) => {
     const req = route.request();
     const url = new URL(req.url());
     const p = url.pathname, m = req.method();
@@ -89,7 +89,7 @@ function adminRoutes(page, { failPatchOnce = false } = {}) {
 }
 
 function fundraisingRoute(page, payload) {
-  return page.route('**poet-donations.lucasmai.workers.dev/api/donations*', (route) =>
+  return page.route('**poet-donations.poetnpo.workers.dev/api/donations*', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(payload) }));
 }
 const oldShape = { donations: [], totalAmount: 555000, totalCount: 3 };

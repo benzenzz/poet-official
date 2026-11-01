@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import { resolvePayosReturnUrls } from '../src/index.js';
 
 const ALLOWED = 'https://maiphh.github.io';
-const PROD_RETURN = 'https://maiphh.github.io/poet/ung-ho/return.html';
-const PROD_CANCEL = 'https://maiphh.github.io/poet/ung-ho/cancel.html';
+const PROD_RETURN = 'https://www.poetnpo.site/ung-ho/return.html';
+const PROD_CANCEL = 'https://www.poetnpo.site/ung-ho/cancel.html';
 
 describe('resolvePayosReturnUrls', () => {
   it('missing origin -> production URLs', () => {
@@ -21,10 +21,13 @@ describe('resolvePayosReturnUrls', () => {
     const result = resolvePayosReturnUrls({
       origin: ALLOWED,
       allowedOrigin: ALLOWED,
-      returnUrl: PROD_RETURN,
-      cancelUrl: PROD_CANCEL,
+      returnUrl: 'https://maiphh.github.io/poet/ung-ho/return.html',
+      cancelUrl: 'https://maiphh.github.io/poet/ung-ho/cancel.html',
     });
-    assert.deepEqual(result, { returnUrl: PROD_RETURN, cancelUrl: PROD_CANCEL });
+    assert.deepEqual(result, {
+      returnUrl: 'https://maiphh.github.io/poet/ung-ho/return.html',
+      cancelUrl: 'https://maiphh.github.io/poet/ung-ho/cancel.html',
+    });
   });
 
   it('accepts an origin from a comma-separated ALLOWED_ORIGIN list', () => {

@@ -18,7 +18,7 @@ await new Promise((r) => server.listen(8139, '127.0.0.1', r));
 
 const browser = await chromium.launch({ channel: 'msedge', headless: true });
 const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-await page.route('**poet-donations.lucasmai.workers.dev/**', (route) =>
+await page.route('**poet-donations.poetnpo.workers.dev/**', (route) =>
   route.fulfill({ status: 200, contentType: 'application/json', body: '{"donations":[],"totalReceived":0,"receivedCount":0,"deals":[],"receivedAmount":0,"receivedCount":0}' }));
 await page.addInitScript(() => {
   sessionStorage.setItem('poetAdminToken', 't');

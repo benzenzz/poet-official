@@ -3,4 +3,4 @@
 // ung-ho/checkout.js (also the v2 bridge) and admin/admin.js read it.
 // This file must load before those scripts (defer scripts run in
 // document order; site.js imports it before ung-ho/checkout.js).
-window.POET_API_BASE = 'https://poet-donations.lucasmai.workers.dev';
+window.POET_API_BASE = 'https://poet-donations.poetnpo.workers.dev';
