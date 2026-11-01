@@ -11,7 +11,8 @@
       "height": 111
     },
     "file": "assets/press/hoa-hoc-tro.png",
-    "bytes": 25802
+    "bytes": 32466,
+    "background": "white made transparent (color-to-alpha), 2026-11-02"
   },
   {
     "source": "assets/press/originals/tienphong_750x750.png",
@@ -25,6 +26,7 @@
       "height": 83
     },
     "file": "assets/press/tien-phong.png",
-    "bytes": 26765
+    "bytes": 41717,
+    "background": "white made transparent (color-to-alpha), 2026-11-02"
   }
 ]

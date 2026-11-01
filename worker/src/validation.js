@@ -72,3 +72,13 @@ export function validateMessage(rawMessage) {
   const message = maskDonationText(text).slice(0, 160);
   return { message, error: null };
 }
+
+/** Wall sticker ids; must match messageWall.glyphs in data/content.mjs. */
+export const STICKERS = Object.freeze(['xe-rua', 'cap-sach', 'cau-tuot', 'dep-lao']);
+
+/** Optional sticker: absent/null -> null, otherwise one of STICKERS. */
+export function validateSticker(raw) {
+  if (raw === undefined || raw === null || raw === '') return { sticker: null, error: null };
+  if (typeof raw !== 'string' || !STICKERS.includes(raw)) return { sticker: null, error: 'Sticker không hợp lệ.' };
+  return { sticker: raw, error: null };
+}

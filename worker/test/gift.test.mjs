@@ -145,3 +145,25 @@ describe('store gift columns', () => {
     assert.equal(r.donations[0].giftId, undefined);
   });
 });
+
+describe('wall sticker', () => {
+  it('validateSticker accepts known ids and empty, rejects others', async () => {
+    const { validateSticker } = await import('../src/validation.js');
+    assert.deepEqual(validateSticker(undefined), { sticker: null, error: null });
+    assert.deepEqual(validateSticker('cau-tuot'), { sticker: 'cau-tuot', error: null });
+    assert.ok(validateSticker('<img>').error);
+    assert.ok(validateSticker(3).error);
+  });
+  it('insert stores sticker after gift columns', async () => {
+    const { env, log } = fakeEnv();
+    await insertPendingDonation(env, { orderCode: 123456789, amount: 15000, displayName: 'Lan', message: '', anonymous: false, sticker: 'dep-lao', nowIso: 'now' });
+    const [sql, args] = log.at(-1);
+    assert.match(sql, /, sticker, status\) VALUES/);
+    assert.equal(args.at(-1), 'dep-lao');
+  });
+  it('public list asks for sticker', async () => {
+    const { env, log } = fakeEnv();
+    await listPublicDonations(env);
+    assert.match(log[0][0], /sticker/);
+  });
+});

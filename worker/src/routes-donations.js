@@ -7,7 +7,7 @@ import { error, json, readJsonBody } from './http.js';
 import { randomOrderCode } from './crypto.js';
 import { resolvePayosReturnUrls } from './callback-urls.js';
 import { createPaymentLink, hmacSha256Hex, verifyDataSignature } from './payos.js';
-import { validateAmountAndGift, validateDisplayName, validateMessage } from './validation.js';
+import { validateAmountAndGift, validateDisplayName, validateMessage, validateSticker } from './validation.js';
 import {
   countRecentAttempts,
   deleteDonation,
@@ -86,6 +86,9 @@ export async function handleCreateDonation(request, env) {
   const { message, error: messageError } = validateMessage(body?.message);
   if (messageError) return error(messageError, 400);
 
+  const { sticker, error: stickerError } = validateSticker(body?.sticker);
+  if (stickerError) return error(stickerError, 400);
+
   const resolved = resolvePayosReturnUrls({
     origin: request.headers.get('Origin'),
     allowedOrigin: env.ALLOWED_ORIGIN,
@@ -102,6 +105,7 @@ export async function handleCreateDonation(request, env) {
     message,
     anonymous,
     gift,
+    sticker,
     nowIso: limit.nowIso,
   });
   if (!orderCode) return error('Không tạo được mã đơn. Vui lòng thử lại.', 500);

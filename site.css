@@ -2103,3 +2103,19 @@ button.v-card{width:100%;padding:0;border:0;font:inherit;cursor:pointer}
 .pay-result-actions{justify-content:center}
 /* fb-47: no mascot between the status line and the eyebrow, so the status keeps its own gap (a generic p rule zeroed it). */
 .site-content.pay-result .thanks-status{margin:0 0 clamp(20px,2.4vw,28px)}
+/* Mùa 6 + fundraising cards (and the logo strip above them) share the site shell, so their edges line up with the sections below. */
+.site-content .campaign-band--prototype .campaign-grid{max-width:1456px;padding-inline:var(--site-gutter)}
+@media(min-width:901px){.home-credibility-inner{max-width:1456px;padding-inline:var(--site-gutter)}}
+.campaign-band--prototype .campaign-story :is(p,li,.campaign-card-footer){letter-spacing:.025em}
+/* Donate dialog: sticker the donor's note wears on the message wall. Native radios stay focusable under the tiles. */
+.donate-form .sticker-pick{margin:20px 0 0;padding:0;border:0;min-width:0}
+.donate-form .sticker-pick legend{padding:0;margin-bottom:8px;font-size:var(--font-size-meta);font-weight:var(--font-weight-bold)}
+.sticker-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.donate-form .sticker-options label{position:relative;display:grid;justify-items:center;gap:4px;margin:0;padding:10px 4px 8px;border:1.5px solid var(--poet-border);border-radius:14px;background:var(--poet-white);font-size:12px;font-weight:var(--font-weight-regular);cursor:pointer;transition:border-color 160ms,background-color 160ms,transform 160ms}
+.sticker-options input{position:absolute;inset:0;margin:0;opacity:0;cursor:pointer}
+.sticker-options img{width:36px;height:36px;object-fit:contain;transition:transform 200ms cubic-bezier(.34,1.56,.64,1)}
+.donate-form .sticker-options label:has(:checked){border-color:var(--poet-yellow);background:var(--paper-yellow,#fff4cc);font-weight:var(--font-weight-bold)}
+.sticker-options label:has(:checked) img{transform:rotate(-8deg) scale(1.08)}
+.sticker-options label:has(:focus-visible){outline:3px solid var(--poet-ink);outline-offset:2px}
+@media(hover:hover){.donate-form .sticker-options label:hover{border-color:var(--poet-yellow)}}
+@media(prefers-reduced-motion:reduce){.sticker-options img,.donate-form .sticker-options label{transition:none}.sticker-options label:has(:checked) img{transform:none}}

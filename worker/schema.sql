@@ -84,3 +84,8 @@ CREATE TABLE IF NOT EXISTS business_deals (
 );
 CREATE INDEX IF NOT EXISTS idx_business_deals_status_amount
   ON business_deals (status, amount);
+
+-- Migrations 0004 (gift) and 0006 (wall sticker).
+ALTER TABLE donations ADD COLUMN gift_id TEXT;
+ALTER TABLE donations ADD COLUMN gift_qty INTEGER;
+ALTER TABLE donations ADD COLUMN sticker TEXT;

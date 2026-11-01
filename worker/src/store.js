@@ -125,24 +125,17 @@ export async function recordAttempt(env, ipHash, nowIso) {
 
 /* -- donations -- */
 
-export async function insertPendingDonation(env, { orderCode, amount, displayName, message, anonymous, gift = null, nowIso }) {
-  if (gift) {
-    // Needs migration 0004. A DB without it fails here (no silent gift loss).
-    await env.DB.prepare(
-      `INSERT INTO donations (
-         order_code, amount, display_name, message, anonymous, status, created_at, gift_id, gift_qty
-       ) VALUES (?, ?, ?, ?, ?, 'pending', ?, ?, ?)`,
-    )
-      .bind(orderCode, amount, displayName, message, anonymous ? 1 : 0, nowIso, gift.id, gift.qty)
-      .run();
-    return;
-  }
+export async function insertPendingDonation(env, { orderCode, amount, displayName, message, anonymous, gift = null, sticker = null, nowIso }) {
+  // Optional columns are only named when used, so a DB missing migration
+  // 0004 (gift) or 0006 (sticker) fails loudly instead of losing the value.
+  const cols = ['order_code', 'amount', 'display_name', 'message', 'anonymous', 'created_at'];
+  const args = [orderCode, amount, displayName, message, anonymous ? 1 : 0, nowIso];
+  if (gift) cols.push('gift_id', 'gift_qty'), args.push(gift.id, gift.qty);
+  if (sticker) cols.push('sticker'), args.push(sticker);
   await env.DB.prepare(
-    `INSERT INTO donations (
-       order_code, amount, display_name, message, anonymous, status, created_at
-     ) VALUES (?, ?, ?, ?, ?, 'pending', ?)`,
+    `INSERT INTO donations (${cols.join(', ')}, status) VALUES (${cols.map(() => '?').join(', ')}, 'pending')`,
   )
-    .bind(orderCode, amount, displayName, message, anonymous ? 1 : 0, nowIso)
+    .bind(...args)
     .run();
 }
 
@@ -156,14 +149,14 @@ export async function setPaymentLinkId(env, orderCode, paymentLinkId) {
     .run();
 }
 
-function publicListStatements(env, withGift, withBusiness, sort) {
+function publicListStatements(env, withGift, withBusiness, sort, withSticker = true) {
   // sort=amount uses idx_donations_success_amount (status, amount).
   const order = sort === 'amount' ? 'amount DESC, paid_at DESC' : 'paid_at DESC';
   const statements = [
     env.DB.prepare(
       `SELECT display_name AS displayName,
               CASE WHEN hidden = 1 THEN '' ELSE message END AS message,
-              amount, paid_at AS paidAt${withGift ? ',\n              gift_id AS giftId, gift_qty AS giftQty' : ''}
+              amount, paid_at AS paidAt${withGift ? ',\n              gift_id AS giftId, gift_qty AS giftQty' : ''}${withSticker ? ', sticker' : ''}
        FROM donations
        WHERE status = 'success'
        ORDER BY ${order}
@@ -199,10 +192,11 @@ export async function listPublicDonations(env, sort = 'new') {
   let businessRow;
   let withGift = true;
   let withBusiness = true;
+  let withSticker = true;
   for (let attempt = 0; attempt < 4; attempt++) {
     try {
       [list, totals, businessRow] = await env.DB.batch(
-        publicListStatements(env, withGift, withBusiness, sort),
+        publicListStatements(env, withGift, withBusiness, sort, withSticker),
       );
       break;
     } catch (err) {
@@ -210,6 +204,10 @@ export async function listPublicDonations(env, sort = 'new') {
       let retry = false;
       if (withGift && /gift_/i.test(msg)) {
         withGift = false;
+        retry = true;
+      }
+      if (withSticker && /sticker/i.test(msg)) {
+        withSticker = false;
         retry = true;
       }
       if (withBusiness && /business_deals/i.test(msg)) {
