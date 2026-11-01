@@ -4,8 +4,10 @@
 import {initStories} from './story.mjs?v=anim-2';
 import {initNumbers} from './numbers.mjs?v=anim-2';
 import {initReveals} from './reveal.mjs?v=anim-2';
+import {initPageWave} from './page-wave.mjs?v=anim-4';
 
 const root=document.documentElement;
+initPageWave();
 const full=root.classList.contains('m-js');
 root.classList.add('m-ready',full?'m-full':'m-reduced');
 initStories({full});

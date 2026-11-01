@@ -394,10 +394,12 @@
     joinLink?.addEventListener('pointerleave',()=>{joinHovered=false;updateJoinInteraction();},{signal:events.signal});
     joinLink?.addEventListener('focusin',()=>{joinFocused=true;updateJoinInteraction(true);},{signal:events.signal});
     joinLink?.addEventListener('focusout',()=>{joinFocused=false;updateJoinInteraction();},{signal:events.signal});
-    function transitionToActivities({keyboard=false,source='click'}={}){
+    function transitionToActivities({keyboard=false,source='click',href=''}={}){
       if(handoff)return;
-      const target=document.getElementById('hoat-dong')||document.getElementById('noi-dung');if(!target)return;
+      const target=document.getElementById('hoat-dong')||document.getElementById('noi-dung');if(!target&&!href)return;
       const navigate=()=>{
+        // Another page: motion/page-wave.mjs there finishes the same wave.
+        if(href){try{sessionStorage.setItem('poet-wave-in','1');}catch{/* Private mode: plain cut. */}location.assign(href);return;}
         history.replaceState(null,'','#hoat-dong');
         target.scrollIntoView({behavior:'instant',block:'start'});
         if(source!=='scroll'){
@@ -422,7 +424,7 @@
         if(stage){stageStyle===null?stage.removeAttribute('style'):stage.setAttribute('style',stageStyle);if(stage._gsap)stage._gsap.uncache=1;}
         document.removeEventListener('keydown',escape);handoff=null;delete root.dataset.heroTransition;announce('complete');syncMotion();
       };
-      const land=()=>{if(navigated)return;navigated=true;navigate();root.dataset.heroTransition='reveal';};
+      const land=()=>{if(navigated)return;navigated=true;navigate();if(href){handoff?.timeline?.pause();return;}root.dataset.heroTransition='reveal';};
       const finish=()=>{land();restore();};
       const escape=event=>{if(event.key==='Escape'){event.preventDefault();finish();}};
       handoff={timeline:null,finish,cancel:restore};root.dataset.heroTransition='anticipation';announce('start');syncMotion();
@@ -441,8 +443,15 @@
         .to(overlay,{y:-innerHeight*1.9,duration:.65,ease:'power3.inOut'},.9)
         .to(wave,{attr:{d:waveA},duration:.65,ease:'sine.inOut'},.9);
       // fb-46: the whole hand-off (authored at ~1.55s) plays in 0.4s; timeScale keeps the beats in proportion.
-      tl.timeScale(tl.duration()/.4);
+      // Stall → message wall: 0.5s in total, ~0.3s here until the wave covers the screen, ~0.2s reveal on the next page.
+      tl.timeScale(href?.88/.3:tl.duration()/.4);
     }
+    const wallLink=q('.stall-link');
+    wallLink?.addEventListener('click',event=>{
+      if(event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||event.button)return;
+      event.preventDefault();if(!resolved)return;
+      transitionToActivities({keyboard:event.detail===0,href:wallLink.href.baseVal||wallLink.getAttribute('href')});
+    },{signal:events.signal});
     joinLink?.addEventListener('click',event=>{
       if(!resolved){event.preventDefault();return;}
       if(root.classList.contains('hero-only')){event.preventDefault();return;}
@@ -468,7 +477,7 @@
     document.addEventListener('visibilitychange',syncMotion,{signal:events.signal});
     reduced.addEventListener('change',respectReducedMotion,{signal:events.signal});
     addEventListener('pagehide',event=>{if(event.persisted){pageSuspended=true;syncMotion();}else stopHeroAnimation();},{signal:events.signal});
-    addEventListener('pageshow',()=>{pageSuspended=false;syncMotion();},{signal:events.signal});
+    addEventListener('pageshow',event=>{if(event.persisted)handoff?.cancel();pageSuspended=false;syncMotion();},{signal:events.signal});
     document.addEventListener('freeze',()=>{pageSuspended=true;syncMotion();},{signal:events.signal});
     document.addEventListener('resume',()=>{pageSuspended=false;syncMotion();},{signal:events.signal});
     // Input never fast-forwards assembly. Only the completed Hero has a wheel handoff.

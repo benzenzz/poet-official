@@ -101,3 +101,9 @@ m-num{display:inline-block;font-variant-numeric:tabular-nums;text-align:right}
 /* The "Đạt 64%" badge pops in once the count has finished. */
 .m-full [data-fund-animate]:is([data-fund-motion=pending],[data-fund-motion=running]) .fund-status{opacity:0;transform:scale(.92)}
 .m-full [data-fund-animate] .fund-status{transition:opacity 400ms ease,transform 500ms var(--ease-enter)!important}
+
+/* Home stall → message wall: flat pink cover from first paint until page-wave.mjs lifts the curved wave. */
+html.wave-in::after{content:"";position:fixed;inset:0;z-index:90;background:var(--poet-pink-light,#fbe8eb)}
+.page-wave{position:fixed;inset:0 0 auto;height:160vh;height:160svh;z-index:90;pointer-events:none;will-change:transform}
+.page-wave svg{display:block;width:100%;height:100%;overflow:visible}
+.page-wave path{fill:var(--poet-pink-light,#fbe8eb)}
