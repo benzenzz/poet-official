@@ -28,7 +28,7 @@ export function fundraising(base) {
   return `<aside class="fundraising" ${fundAttributes(s.progressPercent,100,false)} aria-label="Tiến độ gây quỹ ${s.name}">
     <div class="fund-heading"><p class="eyebrow"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m2 14 5-5 4 3 7-8m-5 0h5v5"/></svg>Tiến độ gây quỹ trực tiếp</p><span class="fund-status">${known?`Đạt ${new Intl.NumberFormat('vi-VN').format(+percent.toFixed(2))}%`:'Chờ cập nhật'}</span></div>
     <strong class="fund-target"><span data-fund-raised>${known?new Intl.NumberFormat('vi-VN').format(s.progressPercent):'—'}</span> <span>%</span></strong>
-    <p class="fund-goal">Mục tiêu công khai ${s.name}: <strong>${new Intl.NumberFormat('vi-VN').format(s.targetAmount)} VNĐ</strong></p>${statementLink}
+    ${statementLink}
     ${fundProgress(state)}
     <div class="supporter-stats"><div><span>Cá nhân</span><strong>${count(s.individuals)}${Number.isFinite(s.individuals)?'<small> người</small>':''}</strong></div><div><span>Doanh nghiệp</span><strong>${count(s.businesses)}${Number.isFinite(s.businesses)?'<small> đối tác</small>':''}</strong></div></div>
     <div class="fund-actions">${fundDonate(base)}${link(base+'dong-hanh/#loi-nhan','Xem tường lời nhắn','btn btn--outline')}</div>
@@ -39,7 +39,7 @@ const uiIcon=(base,name)=>{const u=`url('${base}assets/icons/lucide/${name}.svg'
 const statementLink=`<a class="fund-statement" href="https://docs.google.com/spreadsheets/d/1k-oYOOFK3krtO41jEGkyks04ZdyUIyW6lgqOVbOnYUg/edit?gid=2115322398#gid=2115322398" target="_blank" rel="noopener noreferrer">Xem bảng sao kê${arrowSvg('arrow-up-right','link-arrow')}<span class="sr-only"> (mở trong tab mới)</span></a>`;
 const fundDonate=base=>`<a class="btn" href="${base}dong-hanh/#ca-nhan" data-donate>${uiIcon(base,'heart')}Ủng hộ ngay</a>`;
 function fundAttributes(raised,target,provisional){const state=fundraisingState(raised,target);return `data-fundraising data-raised="${raised??''}" data-target="${target}" data-provisional="${provisional}" data-progress-label="Tiến độ ${s.name}" data-milestone="${state.milestone.name}" style="${fundraisingStyle(state)}"`;}
-function fundProgress(state,provisional=false){const {known,progress,remaining}=state;return `<div class="fund-progress"><div class="fund-progress-track" ${known?`role="progressbar" aria-label="Tiến độ ${s.name}${provisional?' (số liệu minh họa từ prototype)':''}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${+progress.toFixed(2)}"`:'role="img" aria-label="Tiến độ gây quỹ đang chờ số liệu xác nhận"'}><span class="fund-progress-fill" aria-hidden="true"></span></div><div class="fund-scale"><span>0%</span><span>Còn thiếu <span data-fund-remaining>${known?new Intl.NumberFormat('vi-VN').format(+remaining.toFixed(2))+'%':'chờ cập nhật'}</span></span><span>100%</span></div></div>`;}
+function fundProgress(state,provisional=false){const {known,progress,remaining}=state;return `<div class="fund-progress"><div class="fund-progress-track" ${known?`role="progressbar" aria-label="Tiến độ ${s.name}${provisional?' (số liệu minh họa từ prototype)':''}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${+progress.toFixed(2)}"`:'role="img" aria-label="Tiến độ gây quỹ đang chờ số liệu xác nhận"'}><span class="fund-progress-fill" aria-hidden="true"></span></div><div class="fund-scale"><span>Còn thiếu <span data-fund-remaining>${known?new Intl.NumberFormat('vi-VN').format(+remaining.toFixed(2))+'%':'chờ cập nhật'}</span></span><span>Mục tiêu <strong>${new Intl.NumberFormat('vi-VN').format(s.targetAmount)} VNĐ</strong></span></div></div>`;}
 function homeFundraising(base) {
   const number=n=>new Intl.NumberFormat('vi-VN').format(n);
   const value=key=>Number.isFinite(s[key])?s[key]:homepageFundraisingPreview[key];
@@ -53,7 +53,7 @@ function homeFundraising(base) {
     <div class="fund-heading"><p class="eyebrow"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m2 14 5-5 4 3 7-8m-5 0h5v5"/></svg>Tiến độ gây quỹ</p><span class="fund-status"${provisional?' aria-describedby="home-fund-preview-note"':''}>Đạt ${new Intl.NumberFormat('vi-VN').format(+percent.toFixed(2))}%</span></div>
     ${provisional?'<p class="fund-preview-note" id="home-fund-preview-note">Số liệu minh họa</p>':''}
     <strong class="fund-target">${numeric(raised,'data-fund-raised')}<span class="sr-only" data-fund-raised-label>${number(raised)}%</span> <span aria-hidden="true">%</span></strong>
-    <p class="fund-goal">Mục tiêu công khai ${s.name}: <strong>${number(s.targetAmount)} VNĐ</strong></p>${statementLink}
+    ${statementLink}
     ${fundProgress(state,provisional)}
     <div class="supporter-stats"><div><span>${uiIcon(base,'users')}Cá nhân</span><strong>${numeric(value('individuals'),`data-fund-kind="individual" data-fund-count="${value('individuals')}"`)}<small aria-hidden="true"> người</small><span class="sr-only">${number(value('individuals'))} người</span></strong></div><div><span>${uiIcon(base,'building-2')}Doanh nghiệp</span><strong>${numeric(value('businesses'),`data-fund-kind="business" data-fund-count="${value('businesses')}"`)}<small aria-hidden="true"> đối tác</small><span class="sr-only">${number(value('businesses'))} đối tác</span></strong></div></div>
     <div class="fund-actions">${fundDonate(base)}${link(base+'dong-hanh/#loi-nhan','Xem tường lời nhắn','btn btn--outline')}</div>
@@ -65,7 +65,7 @@ function campaignStoryCard(base,detail=false) {
   const c=campaignStory,items=c.activities.map(t=>detail?`<li>${boldMarks(t)}</li>`:`<li>${uiIcon(base,'circle-check')}<span>${boldMarks(t)}</span></li>`).join('');
   return `<div class="campaign-story"><p class="eyebrow"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M16 8c0 4-6 9-6 9S4 12 4 8a6 6 0 1 1 12 0Z"/><circle cx="10" cy="8" r="2"/></svg>${c.eyebrow}</p><h2>Hành trình ${s.name}:<br>${s.title}</h2>${c.intro.map(p=>`<p>${boldMarks(p)}</p>`).join('')}<ul class="${detail?'campaign-activity-list':'campaign-summary-list'}">${items}</ul><div class="campaign-card-footer"><span>Thời gian thực hiện: <strong>${s.timeframe}</strong></span>${link(base+'du-an/'+(detail?'#noi-dung-diem-truong':'#dang-thuc-hien'),'Xem thông tin chi tiết')}</div></div>`;
 }
-function homeCampaign(base) {return `<section class="campaign-band campaign-band--prototype" aria-label="Hành trình Mùa 6"><div class="section-shell campaign-grid">${campaignStoryCard(base)}${homeFundraising(base)}</div></section>`;}
+function homeCampaign(base) {return `<section class="campaign-band campaign-band--prototype" aria-label="Hành trình Mùa 6"><div class="section-shell campaign-grid">${campaignStoryCard(base)}${campaignSide(base)}</div></section>`;}
 export function campaign(base,detail=false) {if(!detail)return homeCampaign(base);return `<section class="campaign-band"><div class="section-shell campaign-grid">${campaignStoryCard(base,true)}${fundraising(base)}</div></section>`;}
 
 export function archive(base,withHeader=true,homeMetrics=false) {return `<section class="section-shell archive-section${homeMetrics?' archive-section--home':''}" id="dau-an">${withHeader?head('Dấu ấn tự hào','Những hành trình yêu thương đã “cập bến”'):''}<div class="archive-grid">${projectStories.map(h=>`<article class="story-card" data-reveal><a class="story-image-link" href="${base+h.href}" aria-label="Đọc ${h.title}">${h.cover?photo(base,h.cover,h.photoCaption):`<div class="story-cover">${pill('Ảnh đang cập nhật')}</div>`}</a><div class="story-copy"><p class="eyebrow">${h.tag}</p><h3><a href="${base+h.href}">${h.title}</a></h3><p>${h.description}</p><ul class="inline-metrics">${h.metrics.map(m=>`<li>${homeMetrics?m.replace(/^(\d+) (.*)$/u,'<strong>$1</strong><span>$2</span>'):m}</li>`).join('')}</ul>${link(base+h.href,'Xem thông tin chi tiết')}</div></article>`).join('')}</div></section>`;}
@@ -108,12 +108,15 @@ function campaignTimeline(now=Date.now()){
   if(now<=end)return {pct:100,text:'Đoàn đang ở điểm trường'};
   return {pct:100,text:'Chuyến đi đã hoàn thành'};
 }
-function campaignTheme(base) {
-  const ic=name=>uiIcon(base,name),t=campaignTimeline();
-  // Home card with the same numbers; only its secondary link changes to the budget table.
-  const card=homeFundraising(base).replace(/<a class="btn btn--outline" href="[^"]*#loi-nhan"[^>]*>[\s\S]*?<\/a>/,`<a class="fund-link" href="#ngan-sach">Xem bảng ngân sách</a>`);
+// Fundraising card shared by Home and Dự án, plus the timeline. Dự án swaps the wall link for the budget table; Home (no budgetHref) keeps the wall button.
+function campaignSide(base,budgetHref) {
+  const t=campaignTimeline();
+  const card=!budgetHref?homeFundraising(base):homeFundraising(base).replace(/<a class="btn btn--outline" href="[^"]*#loi-nhan"[^>]*>[\s\S]*?<\/a>/,`<a class="fund-link" href="${budgetHref}">Xem bảng ngân sách</a>`);
   const timeline=`<div class="fund-timeline" data-campaign-timeline data-prep="${s.prepStart}" data-trip="${s.tripStart}" data-end="${s.tripEnd}"><p class="fund-timeline-text">${t.text}</p><div class="fund-timeline-track" aria-hidden="true"><i style="width:${t.pct}%"></i><b style="left:${t.pct}%"></b></div><div class="fund-timeline-ends"><p><b>${dmy(s.prepStart)}</b><span>Bắt đầu chuẩn bị</span></p><p><b>${dmy(s.tripStart)}</b><span>Lên đường</span></p></div></div>`;
-  return `<section class="section-shell campaign-theme" id="chien-dich"><div class="campaign-theme-grid"><div class="campaign-main"><p class="campaign-season"><i aria-hidden="true"></i>Chiến dịch ${s.name} · ${s.year}</p><h2>${s.park}</h2><p class="campaign-spirit">“<mark>${s.spirit}</mark>”: ${s.spiritLine}</p><p class="campaign-summary">${s.campaignSummary}</p><figure class="campaign-photo"><img src="${base}assets/editorial/cau-truot-mua-6-640.webp" width="590" height="393" loading="lazy" alt="Các em nhỏ ngồi trong ống chui của cầu trượt, cười nhìn vào ống kính."></figure></div><div class="campaign-side">${card.replace(/<\/aside>\s*$/,timeline+'</aside>')}</div></div></section>`;
+  return `<div class="campaign-side">${card.replace(/<\/aside>\s*$/,timeline+'</aside>')}</div>`;
+}
+function campaignTheme(base) {
+  return `<section class="section-shell campaign-theme" id="chien-dich"><div class="campaign-theme-grid"><div class="campaign-main"><p class="campaign-season"><i aria-hidden="true"></i>Chiến dịch ${s.name} · ${s.year}</p><h2>${s.park}</h2><p class="campaign-spirit">“<mark>${s.spirit}</mark>”: ${s.spiritLine}</p><p class="campaign-summary">${s.campaignSummary}</p><figure class="campaign-photo"><img src="${base}assets/editorial/cau-truot-mua-6-640.webp" width="590" height="393" loading="lazy" alt="Các em nhỏ ngồi trong ống chui của cầu trượt, cười nhìn vào ống kính."></figure></div>${campaignSide(base,'#ngan-sach')}</div></section>`;
 }
 // UI-020 (projects): plan block. Six station cards and a two-day timeline, all from season.plan.
 function planSection(base) {
