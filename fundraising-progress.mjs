@@ -1,5 +1,5 @@
 // Shared ES module for the static builder and browser. Amounts are the source of truth.
-import {createFundraisingReveal} from './fundraising-reveal.mjs?v=home-005-3';
+import {createFundraisingReveal} from './fundraising-reveal.mjs?v=home-005-4';
 export const fundraisingMilestones = [
   {name:'coral',color:'#EF8A7D',tint:'#fff8f5',border:'#f0c4bd',ink:'#843c33'},
   {name:'yellow',color:'#FEE161',tint:'#fffdf2',border:'#eddfa0',ink:'#665112'},
@@ -43,11 +43,10 @@ export function initFundraisingProgress(scope=document) {
       bar.setAttribute('role','img');bar.setAttribute('aria-label','Tiến độ gây quỹ đang chờ số liệu xác nhận');
       ['aria-valuemin','aria-valuemax','aria-valuenow','aria-valuetext'].forEach(key=>bar.removeAttribute(key));
     }
-    if(badge)badge.textContent=state.known?`Đạt ${Math.round(state.progress)}%`:'Chờ cập nhật';
-    const total=card.querySelector('[data-fund-raised]'),goal=card.querySelector('[data-fund-target]'),remaining=card.querySelector('[data-fund-remaining]');
+    if(badge)badge.textContent=state.known?`Đạt ${number(+state.progress.toFixed(2))}%`:'Chờ cập nhật';
+    const total=card.querySelector('[data-fund-raised]'),remaining=card.querySelector('[data-fund-remaining]');
     if(total)total.textContent=state.known?number(raised):'—';
-    if(goal)goal.textContent=Number.isFinite(target)&&target>0?number(target):'—';
-    if(remaining)remaining.textContent=state.known?`${number(state.remaining)} VNĐ`:'chờ cập nhật';
+    if(remaining)remaining.textContent=state.known?`${number(+state.remaining.toFixed(2))}%`:'chờ cập nhật';
     reveals.get(card)?.update(state,raised);
   };
   const observers=[...scope.querySelectorAll('[data-fundraising]')].map(card=>{

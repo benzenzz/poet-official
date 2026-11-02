@@ -23,12 +23,12 @@ function activityCarousel(base) {return `<section class="activities-section" id=
 // Three article cards after the approved reference: publisher/date, headline link (stretched over the card), excerpt, footer.
 export function press(base) {const date=d=>new Intl.DateTimeFormat('vi-VN',{timeZone:'UTC',day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date(d+'T00:00:00Z'));return `<section class="section-shell press-section" id="truyen-thong">${head('','Góc nhìn truyền thông')}<div class="press-grid">${media.map(m=>`<article class="media-card"><div class="media-meta"><span class="publication">${m.publication}</span><time datetime="${m.date}">${date(m.date)}</time></div><h3><a href="${m.url}" target="_blank" rel="noopener noreferrer">${m.title}<span class="sr-only"> (mở trong tab mới)</span></a></h3><p>${m.description}</p><div class="media-foot"><span>Báo chí / Cộng đồng</span><span aria-hidden="true">Đọc bài báo${arrowSvg('arrow-up-right','icon-inline')}</span></div></article>`).join('')}</div></section>`;}
 export function fundraising(base) {
-  const state=fundraisingState(s.raised,s.targetAmount),{known,progress:percent}=state;
+  const state=fundraisingState(s.progressPercent,100),{known,progress:percent}=state;
   const count=n=>Number.isFinite(n)?new Intl.NumberFormat('vi-VN').format(n):'Chờ cập nhật';
-  return `<aside class="fundraising" ${fundAttributes(s.raised,s.targetAmount,false)} aria-label="Tiến độ gây quỹ ${s.name}">
-    <div class="fund-heading"><p class="eyebrow"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m2 14 5-5 4 3 7-8m-5 0h5v5"/></svg>Tiến độ gây quỹ trực tiếp</p><span class="fund-status">${known?`Đạt ${Math.round(percent)}%`:'Chờ cập nhật'}</span></div>
-    <strong class="fund-target"><span data-fund-raised>${known?new Intl.NumberFormat('vi-VN').format(s.raised):'—'}</span> <span>VNĐ</span></strong>
-    <p class="fund-goal">Mục tiêu công khai ${s.name}: <strong><span data-fund-target>${new Intl.NumberFormat('vi-VN').format(s.targetAmount)}</span> VNĐ</strong></p>
+  return `<aside class="fundraising" ${fundAttributes(s.progressPercent,100,false)} aria-label="Tiến độ gây quỹ ${s.name}">
+    <div class="fund-heading"><p class="eyebrow"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m2 14 5-5 4 3 7-8m-5 0h5v5"/></svg>Tiến độ gây quỹ trực tiếp</p><span class="fund-status">${known?`Đạt ${new Intl.NumberFormat('vi-VN').format(+percent.toFixed(2))}%`:'Chờ cập nhật'}</span></div>
+    <strong class="fund-target"><span data-fund-raised>${known?new Intl.NumberFormat('vi-VN').format(s.progressPercent):'—'}</span> <span>%</span></strong>
+    <p class="fund-goal">Mục tiêu công khai ${s.name}: <strong>${new Intl.NumberFormat('vi-VN').format(s.targetAmount)} VNĐ</strong></p>${statementLink}
     ${fundProgress(state)}
     <div class="supporter-stats"><div><span>Cá nhân</span><strong>${count(s.individuals)}${Number.isFinite(s.individuals)?'<small> người</small>':''}</strong></div><div><span>Doanh nghiệp</span><strong>${count(s.businesses)}${Number.isFinite(s.businesses)?'<small> đối tác</small>':''}</strong></div></div>
     <div class="fund-actions">${fundDonate(base)}${link(base+'dong-hanh/#loi-nhan','Xem tường lời nhắn','btn btn--outline')}</div>
@@ -36,23 +36,24 @@ export function fundraising(base) {
 
 // mask-image is set inline too: a relative url() inside --icon resolves against site.css, which breaks when the site lives under a sub-path (GitHub Pages /poet/).
 const uiIcon=(base,name)=>{const u=`url('${base}assets/icons/lucide/${name}.svg')`;return `<span class="prototype-icon" style="--icon:${u};-webkit-mask-image:${u};mask-image:${u}" aria-hidden="true"></span>`;};
+const statementLink=`<a class="fund-statement" href="https://docs.google.com/spreadsheets/d/1k-oYOOFK3krtO41jEGkyks04ZdyUIyW6lgqOVbOnYUg/edit?gid=2115322398#gid=2115322398" target="_blank" rel="noopener noreferrer">Xem bảng sao kê${arrowSvg('arrow-up-right','link-arrow')}<span class="sr-only"> (mở trong tab mới)</span></a>`;
 const fundDonate=base=>`<a class="btn" href="${base}dong-hanh/#ca-nhan" data-donate>${uiIcon(base,'heart')}Ủng hộ ngay</a>`;
 function fundAttributes(raised,target,provisional){const state=fundraisingState(raised,target);return `data-fundraising data-raised="${raised??''}" data-target="${target}" data-provisional="${provisional}" data-progress-label="Tiến độ ${s.name}" data-milestone="${state.milestone.name}" style="${fundraisingStyle(state)}"`;}
-function fundProgress(state,provisional=false){const {known,progress,remaining}=state;return `<div class="fund-progress"><div class="fund-progress-track" ${known?`role="progressbar" aria-label="Tiến độ ${s.name}${provisional?' (số liệu minh họa từ prototype)':''}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${+progress.toFixed(2)}"`:'role="img" aria-label="Tiến độ gây quỹ đang chờ số liệu xác nhận"'}><span class="fund-progress-fill" aria-hidden="true"></span></div><div class="fund-scale"><span>0 VNĐ</span><span>Còn thiếu <span data-fund-remaining>${known?new Intl.NumberFormat('vi-VN').format(remaining)+' VNĐ':'chờ cập nhật'}</span></span><span>100%</span></div></div>`;}
+function fundProgress(state,provisional=false){const {known,progress,remaining}=state;return `<div class="fund-progress"><div class="fund-progress-track" ${known?`role="progressbar" aria-label="Tiến độ ${s.name}${provisional?' (số liệu minh họa từ prototype)':''}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${+progress.toFixed(2)}"`:'role="img" aria-label="Tiến độ gây quỹ đang chờ số liệu xác nhận"'}><span class="fund-progress-fill" aria-hidden="true"></span></div><div class="fund-scale"><span>0%</span><span>Còn thiếu <span data-fund-remaining>${known?new Intl.NumberFormat('vi-VN').format(+remaining.toFixed(2))+'%':'chờ cập nhật'}</span></span><span>100%</span></div></div>`;}
 function homeFundraising(base) {
   const number=n=>new Intl.NumberFormat('vi-VN').format(n);
   const value=key=>Number.isFinite(s[key])?s[key]:homepageFundraisingPreview[key];
-  const provisional=['raised','individuals','businesses'].some(key=>!Number.isFinite(s[key]));
-  const raised=value('raised'),state=fundraisingState(raised,s.targetAmount),percent=state.progress;
+  const provisional=['individuals','businesses'].some(key=>!Number.isFinite(s[key]));
+  const raised=s.progressPercent,state=fundraisingState(raised,100),percent=state.progress;
   // Progressive enhancement: establish the pending state synchronously before
   // numeric children are parsed. Without JS, the real final values remain visible.
   const prime='<script>if((!matchMedia("(prefers-reduced-motion:reduce)").matches||(["localhost","127.0.0.1","[::1]"].includes(location.hostname)&&new URLSearchParams(location.search).get("homeMotion")==="full"))&&"IntersectionObserver"in window)document.currentScript.parentElement.dataset.fundMotion="pending";</script>';
   const numeric=(value,attribute)=>`<span class="fund-number" data-fund-final="${number(value)}" aria-hidden="true"><span ${attribute}>${number(value)}</span></span>`;
-  return `<aside class="fundraising" id="gay-quy" data-fund-animate ${fundAttributes(raised,s.targetAmount,provisional)} aria-label="Tiến độ gây quỹ ${s.name}">${prime}
-    <div class="fund-heading"><p class="eyebrow"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m2 14 5-5 4 3 7-8m-5 0h5v5"/></svg>Tiến độ gây quỹ</p><span class="fund-status"${provisional?' aria-describedby="home-fund-preview-note"':''}>Đạt ${Math.round(percent)}%</span></div>
+  return `<aside class="fundraising" id="gay-quy" data-fund-animate ${fundAttributes(raised,100,provisional)} aria-label="Tiến độ gây quỹ ${s.name}">${prime}
+    <div class="fund-heading"><p class="eyebrow"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m2 14 5-5 4 3 7-8m-5 0h5v5"/></svg>Tiến độ gây quỹ</p><span class="fund-status"${provisional?' aria-describedby="home-fund-preview-note"':''}>Đạt ${new Intl.NumberFormat('vi-VN').format(+percent.toFixed(2))}%</span></div>
     ${provisional?'<p class="fund-preview-note" id="home-fund-preview-note">Số liệu minh họa</p>':''}
-    <strong class="fund-target">${numeric(raised,'data-fund-raised')}<span class="sr-only" data-fund-raised-label>${number(raised)} VNĐ</span> <span aria-hidden="true">VNĐ</span></strong>
-    <p class="fund-goal">Mục tiêu công khai ${s.name}: <strong><span data-fund-target>${number(s.targetAmount)}</span> VNĐ</strong></p>
+    <strong class="fund-target">${numeric(raised,'data-fund-raised')}<span class="sr-only" data-fund-raised-label>${number(raised)}%</span> <span aria-hidden="true">%</span></strong>
+    <p class="fund-goal">Mục tiêu công khai ${s.name}: <strong>${number(s.targetAmount)} VNĐ</strong></p>${statementLink}
     ${fundProgress(state,provisional)}
     <div class="supporter-stats"><div><span>${uiIcon(base,'users')}Cá nhân</span><strong>${numeric(value('individuals'),`data-fund-kind="individual" data-fund-count="${value('individuals')}"`)}<small aria-hidden="true"> người</small><span class="sr-only">${number(value('individuals'))} người</span></strong></div><div><span>${uiIcon(base,'building-2')}Doanh nghiệp</span><strong>${numeric(value('businesses'),`data-fund-kind="business" data-fund-count="${value('businesses')}"`)}<small aria-hidden="true"> đối tác</small><span class="sr-only">${number(value('businesses'))} đối tác</span></strong></div></div>
     <div class="fund-actions">${fundDonate(base)}${link(base+'dong-hanh/#loi-nhan','Xem tường lời nhắn','btn btn--outline')}</div>

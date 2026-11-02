@@ -51,7 +51,7 @@ export function createFundraisingReveal(card) {
     const interrupted=running;
     state=next;raised=amount;
     finalValues();
-    card.querySelector('[data-fund-raised-label]').textContent=state.known?`${format(raised)} VNĐ`:'Số tiền đang chờ cập nhật';
+    card.querySelector('[data-fund-raised-label]').textContent=state.known?`${format(raised)}%`:'Tiến độ đang chờ cập nhật';
     for(const number of card.querySelectorAll('.fund-number'))number.dataset.fundFinal=number.querySelector('span').textContent;
     reserveNumbers();
     if(interrupted){finish();return;}

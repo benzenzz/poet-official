@@ -65,7 +65,8 @@ export const season = {
     'Trường đã được hỗ trợ thêm lớp học, điện mặt trời và nước lọc. POET muốn góp tiếp một phần để việc học và giờ ra chơi của các em an toàn hơn.'
   ],
   // The existing donation API is global. No campaign-scoped progress is supplied.
-  raised: null, individuals: null, businesses: null,
+  // Baked fallback for the public sheet's "Tiến độ" %; fundraising-live.mjs replaces it at load.
+  progressPercent: 4.51, raised: null, individuals: null, businesses: null,
   budgetIntro: {
     title: 'Ngân sách<br>gây quỹ Mùa 6',
     lead: 'Mỗi khoản dưới đây được tính từ khảo sát nhu cầu thực tế tại điểm trường Ea Kiết. POET công khai từng khoản để mọi người và nhà&nbsp;tài&nbsp;trợ cùng theo dõi.'

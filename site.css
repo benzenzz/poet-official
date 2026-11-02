@@ -2119,3 +2119,8 @@ button.v-card{width:100%;padding:0;border:0;font:inherit;cursor:pointer}
 .sticker-options label:has(:focus-visible){outline:3px solid var(--poet-ink);outline-offset:2px}
 @media(hover:hover){.donate-form .sticker-options label:hover{border-color:var(--poet-yellow)}}
 @media(prefers-reduced-motion:reduce){.sticker-options img,.donate-form .sticker-options label{transition:none}.sticker-options label:has(:checked) img{transform:none}}
+
+/* Link to the public donation statement sheet, under the goal line. */
+.fund-statement{display:inline-flex;align-items:center;gap:6px;min-height:32px;font-size:13px;font-weight:var(--font-weight-bold);color:var(--poet-ink);text-decoration:underline;text-decoration-color:var(--milestone-color,var(--poet-green));text-decoration-thickness:2px;text-underline-offset:5px}
+.fund-statement .link-arrow{width:14px;height:14px;transition:transform .2s ease}
+@media(hover:hover) and (pointer:fine){.fund-statement:hover .link-arrow{transform:translate(2px,-2px)}}
