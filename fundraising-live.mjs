@@ -68,13 +68,18 @@ function applyToCard(card, f) {
 
 export function initFundraisingLive(scope=document) {
   const cards=scope.querySelectorAll('[data-fundraising]');
-  const base=typeof window.POET_API_BASE==='string'&&/^https:\/\//.test(window.POET_API_BASE)?window.POET_API_BASE:'';
+  const base=window.POET_API_BASE;
   if(!cards.length||!base||typeof fetch!=='function'||typeof AbortSignal?.timeout!=='function')return false;
+  // Holds the count-up (fundraising-reveal) until these fetches settle, either way.
+  const live=[...cards].filter(card=>card.dataset.localPreview!=='true');
+  for(const card of live)card.dataset.fundLoading='true';
   const get=(url,read)=>fetch(url,{signal:AbortSignal.timeout(10000)}).then(r=>r.ok?read(r):null);
   Promise.all([get(SHEET_CSV,r=>r.text()),get(`${base}/api/donations?sort=new`,r=>r.json())]).then(([csv,data])=>{
     const percent=sheetPercent(csv),counts=parseCounts(data);
     if(percent===null||!counts)return;
-    for(const card of cards)if(card.dataset.localPreview!=='true')applyToCard(card,{percent,...counts});
-  }).catch(()=>{/* keep the baked numbers */});
+    for(const card of live)applyToCard(card,{percent,...counts});
+  }).catch(()=>{/* keep the baked numbers */}).finally(()=>{
+    for(const card of live)delete card.dataset.fundLoading;
+  });
   return true;
 }

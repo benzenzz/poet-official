@@ -8,7 +8,7 @@ export function createFundraisingReveal(card) {
   const fullPreview=['localhost','127.0.0.1','[::1]'].includes(location.hostname)&&new URLSearchParams(location.search).get('homeMotion')==='full';
   const reduceMotion=()=>reduced.matches&&!fullPreview;
   const format=n=>new Intl.NumberFormat('vi-VN').format(n);
-  let frame,observer,running=false,disposed=false,played=card.dataset.fundAnimated==='true',state,raised;
+  let frame,observer,running=false,disposed=false,wanted=false,played=card.dataset.fundAnimated==='true',state,raised;
   const total=card.querySelector('[data-fund-raised]');
   const counters=[...card.querySelectorAll('[data-fund-count]')];
   function reserveNumbers(){
@@ -30,6 +30,9 @@ export function createFundraisingReveal(card) {
   }
   function start(){
     if(played)return;
+    // Counting now would run up to the baked fixture, then snap to the live numbers.
+    wanted=card.hasAttribute('data-fund-loading');
+    if(wanted)return;
     if(reduceMotion()||!state.known){finish();return;}
     played=true;running=true;card.dataset.fundAnimated='true';observer?.disconnect();
     // Write the first frame before exposing the numeric layer: no final-value flash.
@@ -56,6 +59,7 @@ export function createFundraisingReveal(card) {
     reserveNumbers();
     if(interrupted){finish();return;}
     if(played||reduceMotion())finish();
+    else if(wanted)start();
   }
   const onMotionChange=()=>{if(reduceMotion())finish();};
   reduced.addEventListener('change',onMotionChange);

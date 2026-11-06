@@ -1057,7 +1057,7 @@ html.reveal-motion .mission-section.will-enter.is-in .mission-card{opacity:1;tra
 :is(.campaign-band--prototype,.campaign-side) [data-fund-animate] .fund-number{display:inline-grid;position:relative;font-variant-numeric:tabular-nums;font-kerning:none;white-space:nowrap}
 :is(.campaign-band--prototype,.campaign-side) [data-fund-animate] .fund-number:before{content:attr(data-fund-reserve);visibility:hidden;grid-area:1/1}
 :is(.campaign-band--prototype,.campaign-side) [data-fund-animate] .fund-number>span{grid-area:1/1;text-align:left}
-:is(.campaign-band--prototype,.campaign-side) [data-fund-motion=pending] .fund-number>span{visibility:hidden}
+:is(.campaign-band--prototype,.campaign-side) [data-fund-motion=pending] .fund-number>span,:is(.campaign-band--prototype,.campaign-side) [data-fund-motion=pending] .fund-status{visibility:hidden}
 :is(.campaign-band--prototype,.campaign-side) [data-fund-motion=pending] .fund-number:after{content:'0';grid-area:1/1}
 :is(.campaign-band--prototype,.campaign-side) [data-fund-animate] .fund-progress-fill{clip-path:inset(0 calc(100% - var(--fund-display-progress,var(--progress))) 0 0);transition:clip-path 500ms ease}
 :is(.campaign-band--prototype,.campaign-side) [data-fund-motion=pending] .fund-progress-fill{clip-path:inset(0 100% 0 0);transition:none}
