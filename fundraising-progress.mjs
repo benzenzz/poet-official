@@ -1,5 +1,5 @@
 // Shared ES module for the static builder and browser. Amounts are the source of truth.
-import {createFundraisingReveal} from './fundraising-reveal.mjs?v=home-005-4';
+import {createFundraisingReveal} from './fundraising-reveal.mjs?v=home-005-6';
 export const fundraisingMilestones = [
   {name:'coral',color:'#EF8A7D',tint:'#fff8f5',border:'#f0c4bd',ink:'#843c33'},
   {name:'yellow',color:'#FEE161',tint:'#fffdf2',border:'#eddfa0',ink:'#665112'},
@@ -55,7 +55,7 @@ export function initFundraisingProgress(scope=document) {
     render(card);
     reveal?.observe();
     const observer=new MutationObserver(()=>render(card));
-    observer.observe(card,{attributes:true,attributeFilter:['data-raised','data-target','data-provisional']});
+    observer.observe(card,{attributes:true,attributeFilter:['data-raised','data-target','data-provisional','data-fund-loading']});
     return {disconnect(){observer.disconnect();reveal?.disconnect();}};
   });
   return ()=>observers.forEach(observer=>observer.disconnect());

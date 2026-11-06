@@ -59,6 +59,10 @@
   const toggle = document.getElementById('donations-toggle');
   const toggleLabel = document.getElementById('donations-toggle-label');
   const settingsStatus = document.getElementById('settings-status');
+  const businessCountForm = document.getElementById('business-count-form');
+  const businessCountInput = document.getElementById('business-count');
+  const businessCountSubmit = document.getElementById('business-count-submit');
+  const businessCountStatus = document.getElementById('business-count-status');
 
   const sumIndividual = document.getElementById('sum-individual');
   const sumBusiness = document.getElementById('sum-business');
@@ -353,6 +357,7 @@
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || 'bad status');
       applySettingsState(data.donationsEnabled !== false);
+      if (Number.isInteger(data.businessCount)) businessCountInput.value = data.businessCount;
     } catch (err) {
       toggleLabel.textContent = 'Chưa tải được trạng thái.';
       setSettingsStatus(err.message || 'Không tải được cài đặt.');
@@ -387,6 +392,29 @@
       setSettingsStatus(err.message || 'Lưu thất bại.');
     } finally {
       toggle.disabled = false;
+    }
+  });
+
+  // ---- Public business count (typed by hand, not counted from the ledger) ----
+
+  businessCountForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    businessCountSubmit.disabled = true;
+    businessCountStatus.textContent = 'Đang lưu…';
+    try {
+      const res = await api('/api/admin/settings', {
+        method: 'POST',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ businessCount: businessCountInput.valueAsNumber }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Lưu thất bại.');
+      businessCountInput.value = data.businessCount;
+      businessCountStatus.textContent = 'Đã lưu. Web sẽ cập nhật trong khoảng 1 phút.';
+    } catch (err) {
+      businessCountStatus.textContent = err.message || 'Lưu thất bại.';
+    } finally {
+      businessCountSubmit.disabled = false;
     }
   });
 

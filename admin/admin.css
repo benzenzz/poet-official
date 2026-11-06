@@ -196,7 +196,7 @@
   text-decoration-thickness: 2px;
   text-underline-offset: 8px;
 }
-.admin-main { flex: 1 1 auto; min-width: 0; display: grid; gap: 24px; }
+.admin-main { flex: 1 1 auto; min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
 
 .admin-card {
   background: var(--poet-white);

@@ -6,6 +6,7 @@ import { timingSafeEqual } from './payos.js';
 import { requireAdmin } from './auth.js';
 import { checkRateLimit, purgePublicListCache } from './routes-donations.js';
 import {
+  validateBusinessCount,
   validateBusinessDeal,
   validateBusinessPatch,
 } from './business.js';
@@ -26,6 +27,7 @@ import {
   findAdminPasswordHash,
   findAdminUser,
   findDonationStatus,
+  getBusinessCount,
   isDonationsEnabled,
   listDonationsForAdmin,
   setDonationHidden,
@@ -176,18 +178,32 @@ export async function handleAdminList(env, url) {
   });
 }
 
-export async function handleGetAdminSettings(env) {
-  return json({ donationsEnabled: await isDonationsEnabled(env) });
+async function readSettings(env) {
+  return {
+    donationsEnabled: await isDonationsEnabled(env),
+    businessCount: await getBusinessCount(env),
+  };
 }
 
-export async function handleUpdateAdminSettings(request, env) {
+export async function handleGetAdminSettings(env) {
+  return json(await readSettings(env));
+}
+
+/** Accepts donationsEnabled, businessCount, or both. */
+export async function handleUpdateAdminSettings(request, env, url) {
   const { body, response: badBody } = await readJsonBody(request);
   if (badBody) return badBody;
-  if (typeof body?.donationsEnabled !== 'boolean') {
-    return error('Thiếu trạng thái bật/tắt ủng hộ.', 400);
+  const hasToggle = typeof body?.donationsEnabled === 'boolean';
+  const hasCount = body?.businessCount !== undefined;
+  if (!hasToggle && !hasCount) return error('Thiếu dữ liệu cài đặt.', 400);
+  if (hasCount) {
+    const bad = validateBusinessCount(body.businessCount);
+    if (bad) return error(bad, 400);
+    await setSetting(env, 'business_count', String(body.businessCount));
+    await purgePublicListCache(url);
   }
-  await setSetting(env, 'donations_enabled', body.donationsEnabled ? '1' : '0');
-  return json({ ok: true, donationsEnabled: body.donationsEnabled });
+  if (hasToggle) await setSetting(env, 'donations_enabled', body.donationsEnabled ? '1' : '0');
+  return json({ ok: true, ...(await readSettings(env)) });
 }
 
 /* -- business deals: manual ledger, never on the public wall -- */

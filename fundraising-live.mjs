@@ -1,8 +1,9 @@
-// Live campaign numbers from the public donation sheet (ER updates it twice a week).
-// The baked values stay as the no-JS / offline fallback; ?fundraisingPreview
-// overrides win locally. On any failure the static numbers remain untouched.
-// Shops whose transfers don't mention Big Joy; the sheet has no type column, so new ones go here by hand.
-const SHOPS=['am ca phe','cai coc me'];
+// Live campaign numbers. Percent: the public donation sheet (ER updates it twice
+// a week). Counts: the Worker, where individual = successful QR donations and
+// business = the number typed into /admin. The baked values stay as the no-JS /
+// offline fallback; ?fundraisingPreview overrides win locally. Both sources must
+// answer: otherwise the counts read "—" (never the fixture, never a half-live mix)
+// and the percent keeps its baked value.
 const SHEET_CSV='https://docs.google.com/spreadsheets/d/1k-oYOOFK3krtO41jEGkyks04ZdyUIyW6lgqOVbOnYUg/export?format=csv&gid=2115322398';
 
 function csvRows(text) {
@@ -19,48 +20,32 @@ function csvRows(text) {
   return rows;
 }
 
-/**
- * Business key for one "Nội dung", '' for an individual, null for a bank test.
- * Bank text loses diacritics and splits words at random ("Nubake ri"), so the
- * Big Joy / cá nhân checks ignore spaces. MoMo sends as a company but the donor
- * is the person named in the text.
- * shortcut: a business is keyed by the next 5 letters after "Big Joy", or the
- * first 12 of the text; replace with a real "Loại" column if the sheet gets one.
- */
-function donorKey(content) {
-  const text=content.normalize('NFD').replace(/\p{M}/gu,'').replace(/đ/gi,'d').toLowerCase(),flat=text.replace(/\s/g,'');
-  if(flat.includes('testing'))return null;
-  const joy=flat.match(/bigjoy(.{1,5})/);
-  if(joy)return joy[1];
-  if(flat.includes('canhan')||/momo|m service/.test(text))return '';
-  const shop=SHOPS.find(s=>new RegExp(`\\b${s}\\b`).test(text));
-  if(shop)return shop.replace(/\s/g,'').slice(0,5);
-  return /\b(ho kinh doanh|cong ty|tnhh|jsc)\b/.test(text)?flat.slice(0,12):'';
-}
-
-/**
- * { percent, individual, business } from the sheet CSV, or null without a valid
- * "Tiến độ" row. individual = donation rows, business = distinct businesses.
- */
-export function parseSheet(csv) {
-  const rows=csvRows(String(csv));
-  const cell=rows.find(r=>r[0]?.trim()==='Tiến độ')?.[1]?.match(/^\s*([\d.,]+)\s*%/);
+/** "Tiến độ" percent from the sheet CSV, or null without a valid row. */
+export function sheetPercent(csv) {
+  const cell=csvRows(String(csv)).find(r=>r[0]?.trim()==='Tiến độ')?.[1]?.match(/^\s*([\d.,]+)\s*%/);
   if(!cell)return null;
   const raw=cell[1],percent=Number(raw.includes(',')&&!raw.includes('.')?raw.replace(',','.'):raw.replace(/,/g,''));
-  if(!Number.isFinite(percent))return null;
-  const head=rows.findIndex(r=>r[1]?.trim()==='Mã giao dịch'),businesses=new Set();
-  let individual=0;
-  for(const r of head<0?[]:rows.slice(head+1)){
-    if(!r[1]?.trim())continue;
-    const key=donorKey(r[3]||'');
-    if(key)businesses.add(key);
-    else if(key==='')individual++;
-  }
-  return {percent,individual,business:businesses.size};
+  return Number.isFinite(percent)?percent:null;
+}
+
+/** { individual, business } from the Worker payload, or null if either is unusable. */
+export function parseCounts(data) {
+  const individual=data?.fundraising?.individualCount,business=data?.fundraising?.businessCount;
+  const valid=n=>Number.isSafeInteger(n)&&n>=0;
+  return valid(individual)&&valid(business)?{individual,business}:null;
 }
 
 const KIND_SUFFIX = { individual: 'người', business: 'đối tác' };
 const fmt = (n) => new Intl.NumberFormat('vi-VN').format(n);
+
+/** Live numbers unavailable: counts read "—" (empty data-fund-count) instead of the baked fixture. */
+function showUnavailable(card) {
+  for (const counter of card.querySelectorAll('[data-fund-count]')) {
+    counter.dataset.fundCount = '';
+    const label = counter.closest('strong')?.querySelector('.sr-only');
+    if (label) label.textContent = 'đang cập nhật';
+  }
+}
 
 /** One card: counts by explicit kind (never DOM order), then the percent. */
 function applyToCard(card, f) {
@@ -93,10 +78,18 @@ function applyToCard(card, f) {
 
 export function initFundraisingLive(scope=document) {
   const cards=scope.querySelectorAll('[data-fundraising]');
-  if(!cards.length||typeof fetch!=='function'||typeof AbortSignal?.timeout!=='function')return false;
-  fetch(SHEET_CSV,{signal:AbortSignal.timeout(10000)}).then(r=>r.ok?r.text():'').then(csv=>{
-    const f=parseSheet(csv);
-    if(f)for(const card of cards)if(card.dataset.localPreview!=='true')applyToCard(card,f);
-  }).catch(()=>{/* keep the baked numbers */});
+  const base=window.POET_API_BASE;
+  if(!cards.length||!base||typeof fetch!=='function'||typeof AbortSignal?.timeout!=='function')return false;
+  // Holds the count-up (fundraising-reveal) until these fetches settle, either way.
+  const live=[...cards].filter(card=>card.dataset.localPreview!=='true');
+  for(const card of live)card.dataset.fundLoading='true';
+  const get=(url,read)=>fetch(url,{signal:AbortSignal.timeout(10000)}).then(r=>r.ok?read(r):null);
+  Promise.all([get(SHEET_CSV,r=>r.text()),get(`${base}/api/donations?sort=new`,r=>r.json())]).then(([csv,data])=>{
+    const percent=sheetPercent(csv),counts=parseCounts(data);
+    if(percent===null||!counts)throw new Error('live numbers unavailable');
+    for(const card of live)applyToCard(card,{percent,...counts});
+  }).catch(()=>{for(const card of live)showUnavailable(card);}).finally(()=>{
+    for(const card of live)delete card.dataset.fundLoading;
+  });
   return true;
 }

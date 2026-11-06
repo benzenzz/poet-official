@@ -26,7 +26,7 @@
   <!-- Tokens only: no poet-nav, no donate dialog, no GSAP, no playground. -->
   <link rel="stylesheet" href="../v2.css">
   <link rel="stylesheet" href="../site.css?v=fb-30">
-  <link rel="stylesheet" href="admin.css?v=fb-48">
+  <link rel="stylesheet" href="admin.css?v=fb-60">
   <!-- Classic script; config.js must load first so window.POET_API_BASE exists. -->
   <script src="../config.js" defer></script>
   <script src="admin.js" defer></script>
@@ -187,6 +187,14 @@
             </div>
 
             <div class="admin-subpanel" role="tabpanel" id="doanh-nghiep" aria-labelledby="sub-doanh-nghiep" tabindex="0" hidden>
+              <form class="admin-filters" id="business-count-form">
+                <label class="admin-filter" for="business-count">
+                  <span>Số doanh nghiệp hiện trên web</span>
+                  <input id="business-count" type="number" inputmode="numeric" min="0" max="100000" step="1" required>
+                </label>
+                <button class="btn" id="business-count-submit" type="submit">Lưu số doanh nghiệp</button>
+              </form>
+              <p class="admin-status" id="business-count-status" role="status"></p>
               <div class="admin-filters">
                 <label class="admin-filter" for="business-status-filter">
                   <span>Trạng thái</span>

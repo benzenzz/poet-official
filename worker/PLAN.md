@@ -154,8 +154,8 @@ All JSON errors are `{ "error": "..." }` in Vietnamese, with the right status co
 | `GET /api/admin/me` | Session check, returns `{ username }`. |
 | `POST /api/admin/logout` | Drop the current session. |
 | `POST /api/admin/change-password` | `{ currentPassword, newPassword }`, drops other sessions. |
-| `GET /api/admin/settings` | Read the on/off flag. |
-| `POST /api/admin/settings` | `{ donationsEnabled }` — turn the donation site on/off. |
+| `GET /api/admin/settings` | Read the on/off flag and the public business count. |
+| `POST /api/admin/settings` | `{ donationsEnabled }` and/or `{ businessCount }` — turn the donation site on/off; set the business count shown publicly as `fundraising.businessCount`. |
 | `GET /api/admin/donations` | Full donate history (all statuses, newest first, max 200) with bank audit fields. |
 | `POST /api/admin/donations/:orderCode/publish` | `paid` or `hidden` becomes `published`. |
 | `POST /api/admin/donations/:orderCode/hide` | `published` or `paid` becomes `hidden`. |

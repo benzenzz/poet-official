@@ -30,6 +30,10 @@ export async function isDonationsEnabled(env) {
   return (await getSetting(env, 'donations_enabled', '1')) !== '0';
 }
 
+export async function getBusinessCount(env) {
+  return Number(await getSetting(env, 'business_count', '0')) || 0;
+}
+
 /* -- admin users / sessions -- */
 
 /**
@@ -163,7 +167,9 @@ function publicListStatements(env, withGift, withBusiness, sort, withSticker = t
        LIMIT ${PUBLIC_WALL_LIMIT}`,
     ),
     env.DB.prepare(
-      `SELECT COALESCE(SUM(amount), 0) AS totalAmount, COUNT(*) AS totalCount
+      // business_count is the number typed in /admin, not derived from the ledger.
+      `SELECT COALESCE(SUM(amount), 0) AS totalAmount, COUNT(*) AS totalCount,
+              (SELECT value FROM settings WHERE key = 'business_count') AS businessCount
        FROM donations
        WHERE status = 'success'`,
     ),
@@ -223,7 +229,7 @@ export async function listPublicDonations(env, sort = 'new') {
   const individualAmount = Number(totalRow?.totalAmount) || 0;
   const individualCount = Number(totalRow?.totalCount) || 0;
   const businessAmount = Number(business.businessAmount) || 0;
-  const businessCount = Number(business.businessCount) || 0;
+  const businessCount = Number(totalRow?.businessCount) || 0;
 
   return {
     donations: results || [],

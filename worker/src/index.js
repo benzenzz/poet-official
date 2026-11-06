@@ -88,7 +88,7 @@ async function route(request, env, url, ctx) {
     return withAdmin(request, env, () => handleGetAdminSettings(env));
   }
   if (method === 'POST' && pathname === '/api/admin/settings') {
-    return withAdmin(request, env, () => handleUpdateAdminSettings(request, env));
+    return withAdmin(request, env, () => handleUpdateAdminSettings(request, env, url));
   }
   if (method === 'GET' && pathname === '/api/admin/donations') {
     return withAdmin(request, env, () => handleAdminList(env, url));

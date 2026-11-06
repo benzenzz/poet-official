@@ -1,8 +1,8 @@
 import './config.js';
 import './ung-ho/checkout.js';
 import {initLocalFundraisingPreview} from './fundraising-preview.mjs';
-import {initFundraisingProgress} from './fundraising-progress.mjs?v=home-005-4';
-import {initFundraisingLive} from './fundraising-live.mjs?v=fund-live-5';
+import {initFundraisingProgress} from './fundraising-progress.mjs?v=home-005-6';
+import {initFundraisingLive} from './fundraising-live.mjs?v=fund-live-9';
 initLocalFundraisingPreview();
 initFundraisingProgress();
 initFundraisingLive();
