@@ -2,7 +2,8 @@
 // a week). Counts: the Worker, where individual = successful QR donations and
 // business = the number typed into /admin. The baked values stay as the no-JS /
 // offline fallback; ?fundraisingPreview overrides win locally. Both sources must
-// answer: otherwise the static numbers stay, so live data never mixes with the fixture.
+// answer: otherwise the counts read "—" (never the fixture, never a half-live mix)
+// and the percent keeps its baked value.
 const SHEET_CSV='https://docs.google.com/spreadsheets/d/1k-oYOOFK3krtO41jEGkyks04ZdyUIyW6lgqOVbOnYUg/export?format=csv&gid=2115322398';
 
 function csvRows(text) {
@@ -36,6 +37,15 @@ export function parseCounts(data) {
 
 const KIND_SUFFIX = { individual: 'người', business: 'đối tác' };
 const fmt = (n) => new Intl.NumberFormat('vi-VN').format(n);
+
+/** Live numbers unavailable: counts read "—" (empty data-fund-count) instead of the baked fixture. */
+function showUnavailable(card) {
+  for (const counter of card.querySelectorAll('[data-fund-count]')) {
+    counter.dataset.fundCount = '';
+    const label = counter.closest('strong')?.querySelector('.sr-only');
+    if (label) label.textContent = 'đang cập nhật';
+  }
+}
 
 /** One card: counts by explicit kind (never DOM order), then the percent. */
 function applyToCard(card, f) {
@@ -76,9 +86,9 @@ export function initFundraisingLive(scope=document) {
   const get=(url,read)=>fetch(url,{signal:AbortSignal.timeout(10000)}).then(r=>r.ok?read(r):null);
   Promise.all([get(SHEET_CSV,r=>r.text()),get(`${base}/api/donations?sort=new`,r=>r.json())]).then(([csv,data])=>{
     const percent=sheetPercent(csv),counts=parseCounts(data);
-    if(percent===null||!counts)return;
+    if(percent===null||!counts)throw new Error('live numbers unavailable');
     for(const card of live)applyToCard(card,{percent,...counts});
-  }).catch(()=>{/* keep the baked numbers */}).finally(()=>{
+  }).catch(()=>{for(const card of live)showUnavailable(card);}).finally(()=>{
     for(const card of live)delete card.dataset.fundLoading;
   });
   return true;

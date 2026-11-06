@@ -21,7 +21,7 @@ export function createFundraisingReveal(card) {
   }
   function finalValues(){
     total.textContent=state.known?format(raised):'—';
-    for(const counter of counters)counter.textContent=format(Number(counter.dataset.fundCount));
+    for(const counter of counters)counter.textContent=counter.dataset.fundCount===''?'—':format(Number(counter.dataset.fundCount));
     card.style.removeProperty('--fund-display-progress');
   }
   function finish(){
@@ -36,7 +36,7 @@ export function createFundraisingReveal(card) {
     if(reduceMotion()||!state.known){finish();return;}
     played=true;running=true;card.dataset.fundAnimated='true';observer?.disconnect();
     // Write the first frame before exposing the numeric layer: no final-value flash.
-    total.textContent='0';counters.forEach(counter=>counter.textContent='0');
+    total.textContent='0';counters.forEach(counter=>counter.textContent=counter.dataset.fundCount===''?'—':'0');
     card.style.setProperty('--fund-display-progress','0%');card.dataset.fundMotion='running';
     const startTime=performance.now();
     const tick=now=>{
@@ -45,7 +45,7 @@ export function createFundraisingReveal(card) {
       total.textContent=format(amountProgress===1?raised:Math.round(raised*amountProgress));
       card.style.setProperty('--fund-display-progress',`${state.progress*amountProgress}%`);
       let counting=amountProgress<1;
-      counters.forEach((counter,i)=>{const value=Number(counter.dataset.fundCount),t=Math.min(1,Math.max(0,(elapsed-COUNT_DELAY_MS-i*150)/COUNT_MS)),p=easeOutExpo(t);if(t<1)counting=true;counter.textContent=format(p===1?value:Math.round(value*p));});
+      counters.forEach((counter,i)=>{if(counter.dataset.fundCount===''){counter.textContent='—';return;}const value=Number(counter.dataset.fundCount),t=Math.min(1,Math.max(0,(elapsed-COUNT_DELAY_MS-i*150)/COUNT_MS)),p=easeOutExpo(t);if(t<1)counting=true;counter.textContent=format(p===1?value:Math.round(value*p));});
       if(counting)frame=requestAnimationFrame(tick);else finish();
     };
     frame=requestAnimationFrame(tick);

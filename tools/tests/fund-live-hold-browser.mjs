@@ -47,6 +47,7 @@ for (const frame of ok.seen) {
   assert.ok(visibility === 'hidden' || badge === 'Đạt 9,72%', `old badge leaked: ${frame}`);
 }
 const down = await run(true);
-assert.ok(down.last.startsWith('248/14|'), `fallback must still resolve: ${down.last}`);
+assert.ok(down.last.startsWith('—/—|'), `counts must read — when live numbers fail: ${down.last}`);
+for (const frame of down.seen) assert.ok(!frame.startsWith('248/'), `fixture leaked offline: ${frame}`);
 await browser.close();
-console.log(`ok: ${ok.seen.length} distinct frames, none above 4/5; offline falls back to ${down.last}`);
+console.log(`ok: ${ok.seen.length} distinct frames, none above 4/5; offline shows ${down.last}`);
