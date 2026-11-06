@@ -57,6 +57,21 @@ document.querySelectorAll('.story-card a[href^="#"]').forEach(a=>a.addEventListe
 import './activity-carousel.js?v=home-005-5';
 import './press-strip.js?v=poet-v3-1';
 
+// Góc nhìn truyền thông: arrows move the native scroller by one card; hidden until JS runs and only when cards overflow.
+document.querySelectorAll('.press-section').forEach(section=>{
+  const track=section.querySelector('.press-grid'),controls=section.querySelector('.press-controls');
+  if(!track||!controls)return;
+  const [prev,next]=controls.querySelectorAll('button'),reduced=matchMedia('(prefers-reduced-motion:reduce)');
+  const sync=()=>{const max=track.scrollWidth-track.clientWidth;controls.hidden=max<=1;prev.setAttribute('aria-disabled',track.scrollLeft<=1);next.setAttribute('aria-disabled',track.scrollLeft>=max-1);};
+  controls.addEventListener('click',event=>{
+    const button=event.target.closest('button');if(!button)return;
+    const card=track.firstElementChild,step=card.getBoundingClientRect().width+parseFloat(getComputedStyle(track).columnGap);
+    track.scrollBy({left:Number(button.dataset.pressStep)*step,behavior:reduced.matches?'auto':'smooth'});
+  });
+  track.addEventListener('scroll',sync,{passive:true});addEventListener('resize',sync);
+  sync();section.dataset.pressReady='';
+});
+
 // Reveal once, with readable fallback; no global animation loop.
 const reveals=document.querySelectorAll('[data-reveal]');
 // Local previews play entrances even when the OS reports reduced motion, as world.js does; ?heroMotion=respect opts out.

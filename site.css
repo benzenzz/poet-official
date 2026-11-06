@@ -199,8 +199,19 @@ poet-nav.site-nav{display:block;position:sticky;top:0;z-index:50;height:80px;bac
 .archive-section,.press-section{--press-title:var(--poet-heading);--press-body:#6f6862;--press-accent:#a04424;--press-border:#ebe4d8}
 .press-section{padding-top:95px;background:var(--poet-cream)}
 .press-section .section-heading{margin-bottom:24px}
-.press-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
-.press-grid .media-card{position:relative;width:auto;min-width:0;display:flex;flex-direction:column;background:#fff;border:1px solid var(--press-border);border-radius:12px;padding:22px 22px 18px;transition:border-color 180ms ease,box-shadow 180ms ease}
+/* One horizontal row: trackpad/touch scroll natively, arrows step exactly one card. Padding/margin keep the hover shadow from being clipped. */
+.press-section .section-heading{display:flex;align-items:flex-end}
+.press-controls{display:flex;gap:8px;flex:none}
+.press-controls[hidden]{display:none}
+.press-controls button{display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--press-border);border-radius:10px;background:#fff;color:var(--press-title);cursor:pointer;transition:border-color 180ms ease,opacity 180ms ease}
+.press-controls button svg{width:20px;height:20px}
+.press-controls button[aria-disabled=true]{opacity:.4;cursor:default}
+.press-controls button:focus-visible{outline:2px solid var(--poet-green);outline-offset:2px}
+@media(hover:hover) and (pointer:fine){.press-controls button:not([aria-disabled=true]):hover{border-color:#f1d27a}}
+.press-grid{display:flex;gap:20px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;padding:8px 0 24px;margin:-8px 0 -24px}
+[data-press-ready] .press-grid{scrollbar-width:none}
+[data-press-ready] .press-grid::-webkit-scrollbar{display:none}
+.press-grid .media-card{flex:0 0 calc((100% - 40px) / 3);scroll-snap-align:start;position:relative;width:auto;min-width:0;display:flex;flex-direction:column;background:#fff;border:1px solid var(--press-border);border-radius:12px;padding:22px 22px 18px;transition:border-color 180ms ease,box-shadow 180ms ease}
 .media-meta{display:flex;justify-content:space-between;gap:12px;font-size:var(--font-size-caption);line-height:1.5}
 .media-meta .publication{color:var(--press-accent);font-weight:var(--font-weight-bold)}
 .media-meta time{color:var(--press-body);font-variant-numeric:tabular-nums}
@@ -212,7 +223,7 @@ poet-nav.site-nav{display:block;position:sticky;top:0;z-index:50;height:80px;bac
 .press-grid .media-card:focus-within{border-color:#f1d27a;box-shadow:0 6px 18px rgb(51 43 39 / 6%)}
 .press-grid .media-card h3 a:focus-visible{color:var(--poet-green)}
 @media(hover:hover) and (pointer:fine){.press-grid .media-card:hover{border-color:#f1d27a;box-shadow:0 6px 18px rgb(51 43 39 / 6%)}.press-grid .media-card:hover h3 a{color:var(--poet-green)}}
-@media(max-width:900px){.press-grid{grid-template-columns:1fr;gap:14px}}
+@media(max-width:900px){.press-grid{gap:14px}.press-grid .media-card{flex-basis:min(340px,82%)}}
 @media(max-width:600px){.press-section{padding-top:76px}}
 .join-section{background:#f8efd8}
 .join-section .section-heading{margin-bottom:60px}
