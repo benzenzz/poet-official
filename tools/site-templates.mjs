@@ -116,7 +116,7 @@ function campaignSide(base,budgetHref) {
   return `<div class="campaign-side">${card.replace(/<\/aside>\s*$/,timeline+'</aside>')}</div>`;
 }
 function campaignTheme(base) {
-  return `<section class="section-shell campaign-theme" id="chien-dich"><div class="campaign-theme-grid"><div class="campaign-main"><p class="campaign-season"><i aria-hidden="true"></i>Chiến dịch ${s.name} · ${s.year}</p><h2>${s.park}</h2><p class="campaign-spirit">“<mark>${s.spirit}</mark>”: ${s.spiritLine}</p><p class="campaign-summary">${s.campaignSummary}</p><figure class="campaign-photo"><img src="${base}assets/editorial/cau-truot-mua-6-640.webp" width="590" height="393" loading="lazy" alt="Các em nhỏ ngồi trong ống chui của cầu trượt, cười nhìn vào ống kính."></figure></div>${campaignSide(base,'#ngan-sach')}</div></section>`;
+  return `<section class="section-shell campaign-theme" id="chien-dich"><div class="campaign-theme-grid"><div class="campaign-main"><p class="campaign-season"><i aria-hidden="true"></i>Chiến dịch ${s.name} · ${s.year}</p><h2>${s.park}</h2><p class="campaign-spirit">“<mark>${s.spirit}</mark>”: ${s.spiritLine}</p><p class="campaign-summary">${s.campaignSummary}</p><figure class="campaign-photo"><img src="${base}assets/editorial/cau-truot-mua-6-1280.webp" srcset="${base}assets/editorial/cau-truot-mua-6-640.webp 640w, ${base}assets/editorial/cau-truot-mua-6-1280.webp 1280w, ${base}assets/editorial/cau-truot-mua-6-1920.webp 1920w" sizes="(max-width:900px) 92vw, 55vw" width="1280" height="853" loading="lazy" alt="Các em nhỏ ngồi trong ống chui của cầu trượt, cười nhìn vào ống kính."></figure></div>${campaignSide(base,'#ngan-sach')}</div></section>`;
 }
 // UI-020 (projects): plan block. Six station cards and a two-day timeline, all from season.plan.
 function planSection(base) {
@@ -166,7 +166,7 @@ function projectWaysSection(base) {
 const storyLine=(text,hl)=>esc(text).replace(/\[([^\]]+)\]/g,(m,x)=>`<mark class="hl-${hl}">${x}</mark>`);
 function projectStorySection(base) {
   const ps=projectStory,img=(name,w)=>`${base}assets/editorial/${name}-${w}.webp`;
-  const src=p=>p==='lop-hoc'?`${base}assets/editorial/lop-hoc-1280.webp`:p==='cau-truot-mua-6'?`${base}assets/editorial/cau-truot-mua-6-640.webp`:img(p,1920);
+  const src=p=>p==='lop-hoc'?`${base}assets/editorial/lop-hoc-1280.webp`:img(p,1920);
   const frames=ps.steps.map((st,i)=>`<figure class="story-frame${i===0?' is-on':''}"><div class="story-crop story-crop--${st.crop}"><img src="${src(st.photo)}" alt="" loading="lazy" decoding="async"></div></figure>`).join('');
   const steps=ps.steps.map(st=>`<li class="story-step"><figure class="story-step-photo"><div class="story-crop story-crop--${st.crop}"><img src="${src(st.photo)}" alt="${esc(st.alt)}" loading="lazy" decoding="async"></div></figure><p class="story-line${st.long?' long':''}">${st.hl?storyLine(st.text,st.hl):esc(st.text)}</p></li>`).join('');
   return `<section class="project-story" id="cau-chuyen-diem-truong"><div class="story-scrolly"><div class="story-stage" aria-hidden="true">${frames}</div><ol class="story-steps">${steps}</ol></div></section>`;
