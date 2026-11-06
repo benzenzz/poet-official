@@ -1,6 +1,8 @@
 // Live campaign numbers from the public donation sheet (ER updates it twice a week).
 // The baked values stay as the no-JS / offline fallback; ?fundraisingPreview
 // overrides win locally. On any failure the static numbers remain untouched.
+// Shops whose transfers don't mention Big Joy; the sheet has no type column, so new ones go here by hand.
+const SHOPS=['am ca phe','cai coc me'];
 const SHEET_CSV='https://docs.google.com/spreadsheets/d/1k-oYOOFK3krtO41jEGkyks04ZdyUIyW6lgqOVbOnYUg/export?format=csv&gid=2115322398';
 
 function csvRows(text) {
@@ -18,9 +20,27 @@ function csvRows(text) {
 }
 
 /**
+ * Business key for one "Nội dung", '' for an individual, null for a bank test.
+ * Bank text loses diacritics and splits words at random ("Nubake ri"), so the
+ * Big Joy / cá nhân checks ignore spaces. MoMo sends as a company but the donor
+ * is the person named in the text.
+ * shortcut: a business is keyed by the next 5 letters after "Big Joy", or the
+ * first 12 of the text; replace with a real "Loại" column if the sheet gets one.
+ */
+function donorKey(content) {
+  const text=content.normalize('NFD').replace(/\p{M}/gu,'').replace(/đ/gi,'d').toLowerCase(),flat=text.replace(/\s/g,'');
+  if(flat.includes('testing'))return null;
+  const joy=flat.match(/bigjoy(.{1,5})/);
+  if(joy)return joy[1];
+  if(flat.includes('canhan')||/momo|m service/.test(text))return '';
+  const shop=SHOPS.find(s=>new RegExp(`\\b${s}\\b`).test(text));
+  if(shop)return shop.replace(/\s/g,'').slice(0,5);
+  return /\b(ho kinh doanh|cong ty|tnhh|jsc)\b/.test(text)?flat.slice(0,12):'';
+}
+
+/**
  * { percent, individual, business } from the sheet CSV, or null without a valid
- * "Tiến độ" row. Each donation row (has a transaction code) counts by its
- * "Nội dung": "cá nhân" -> individual, "Big Joy Little Joy" -> business.
+ * "Tiến độ" row. individual = donation rows, business = distinct businesses.
  */
 export function parseSheet(csv) {
   const rows=csvRows(String(csv));
@@ -28,14 +48,15 @@ export function parseSheet(csv) {
   if(!cell)return null;
   const raw=cell[1],percent=Number(raw.includes(',')&&!raw.includes('.')?raw.replace(',','.'):raw.replace(/,/g,''));
   if(!Number.isFinite(percent))return null;
-  const head=rows.findIndex(r=>r[1]?.trim()==='Mã giao dịch'),kind={individual:0,business:0};
+  const head=rows.findIndex(r=>r[1]?.trim()==='Mã giao dịch'),businesses=new Set();
+  let individual=0;
   for(const r of head<0?[]:rows.slice(head+1)){
-    const content=(r[3]||'').toLowerCase();
     if(!r[1]?.trim())continue;
-    if(content.includes('big joy little joy'))kind.business++;
-    else if(content.includes('cá nhân'))kind.individual++;
+    const key=donorKey(r[3]||'');
+    if(key)businesses.add(key);
+    else if(key==='')individual++;
   }
-  return {percent,...kind};
+  return {percent,individual,business:businesses.size};
 }
 
 const KIND_SUFFIX = { individual: 'người', business: 'đối tác' };
