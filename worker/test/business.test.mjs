@@ -4,6 +4,7 @@ import {
   validateBusinessDeal,
   validateBusinessPatch,
   validateBusinessAmount,
+  validateBusinessCount,
   BUSINESS_MAX_AMOUNT,
 } from '../src/business.js';
 import { handleListPublic } from '../src/routes-donations.js';
@@ -11,6 +12,7 @@ import {
   handleBusinessCreate,
   handleBusinessUpdate,
   handleBusinessDelete,
+  handleUpdateAdminSettings,
 } from '../src/routes-admin.js';
 import worker from '../src/index.js';
 
@@ -131,7 +133,7 @@ function fakePublicEnv({ hasBusinessTable = true } = {}) {
           return { results: [{ businessAmount: 500000, businessCount: 1 }] };
         }
         if (/AS totalAmount/.test(sql)) {
-          return { results: [{ totalAmount: 300000, totalCount: 2 }] };
+          return { results: [{ totalAmount: 300000, totalCount: 2, businessCount: '7' }] };
         }
         return { results: [
           { displayName: 'Lan', message: 'Hi', amount: 100000, paidAt: 'x' },
@@ -144,7 +146,7 @@ function fakePublicEnv({ hasBusinessTable = true } = {}) {
 }
 
 describe('public payload adds fundraising without touching the wall fields', () => {
-  it('individual figures equal the wall totals; raised adds only received deals', async () => {
+  it('individual figures equal the wall totals; business count is the typed setting, not the ledger', async () => {
     const { env } = fakePublicEnv();
     const res = await handleListPublic(env, null, new URL('http://w/api/donations'));
     assert.equal(res.status, 200);
@@ -155,11 +157,11 @@ describe('public payload adds fundraising without touching the wall fields', () 
       individualAmount: 300000,
       individualCount: 2,
       businessAmount: 500000,
-      businessCount: 1,
+      businessCount: 7,
       raisedAmount: 800000,
     });
   });
-  it('missing business_deals table: wall stays intact, business figures are 0', async () => {
+  it('missing business_deals table: wall stays intact, business money is 0', async () => {
     const { env, log } = fakePublicEnv({ hasBusinessTable: false });
     const res = await handleListPublic(env, null, new URL('http://w/api/donations'));
     assert.equal(res.status, 200);
@@ -169,11 +171,52 @@ describe('public payload adds fundraising without touching the wall fields', () 
       individualAmount: 300000,
       individualCount: 2,
       businessAmount: 0,
-      businessCount: 0,
+      businessCount: 7,
       raisedAmount: 300000,
     });
     // The retried batch drops only the business statement.
     assert.equal(log.filter((s) => /business_deals/.test(s)).length, 0);
+  });
+});
+
+describe('typed business count in admin settings', () => {
+  const settingsEnv = () => {
+    const store = new Map();
+    const DB = { prepare: (sql) => ({
+      bind(...a) { this.args = a; return this; },
+      async first() { return store.has(this.args[0]) ? { value: store.get(this.args[0]) } : null; },
+      async run() { store.set(this.args[0], this.args[1]); assert.match(sql, /INSERT INTO settings/); },
+    }) };
+    return { env: { DB }, store };
+  };
+  const post = (env, body) => handleUpdateAdminSettings(
+    new Request('http://w/api/admin/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    }),
+    env,
+    new URL('http://w/api/admin/settings'),
+  );
+
+  it('accepts whole numbers in range only', () => {
+    for (const n of [0, 14, 100000]) assert.equal(validateBusinessCount(n), null);
+    for (const n of [-1, 1.5, 100001, '3', null]) assert.ok(validateBusinessCount(n), String(n));
+  });
+  it('saving the count leaves the toggle alone, and the reverse', async () => {
+    const { env, store } = settingsEnv();
+    const data = await (await post(env, { businessCount: 14 })).json();
+    assert.equal(data.businessCount, 14);
+    assert.equal(data.donationsEnabled, true);
+    assert.equal(store.has('donations_enabled'), false);
+    const off = await (await post(env, { donationsEnabled: false })).json();
+    assert.deepEqual([off.businessCount, off.donationsEnabled], [14, false]);
+  });
+  it('rejects a bad count without writing, and an empty body', async () => {
+    const { env, store } = settingsEnv();
+    assert.equal((await post(env, { businessCount: -1 })).status, 400);
+    assert.equal((await post(env, {})).status, 400);
+    assert.equal(store.size, 0);
   });
 });
 

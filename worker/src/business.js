@@ -11,6 +11,8 @@ export const BUSINESS_STATUSES = ['pledged', 'received', 'cancelled'];
 /** Contract money, not a PayOS link: the 10.000–20.000.000 cap does not apply. */
 export const BUSINESS_MAX_AMOUNT = 2_000_000_000;
 
+export const BUSINESS_COUNT_MAX = 100_000;
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+$/;
 const TAX_CODE_RE = /^[0-9-]*$/;
 
@@ -34,6 +36,14 @@ function cleanText(value, field, max, required) {
 export function validateBusinessAmount(amount) {
   if (!Number.isInteger(amount) || amount < 1 || amount > BUSINESS_MAX_AMOUNT) {
     return AMOUNT_ERROR;
+  }
+  return null;
+}
+
+/** The public partner count typed in /admin; independent of the deal ledger. */
+export function validateBusinessCount(count) {
+  if (!Number.isInteger(count) || count < 0 || count > BUSINESS_COUNT_MAX) {
+    return 'Số doanh nghiệp phải là số nguyên từ 0 đến 100.000.';
   }
   return null;
 }
