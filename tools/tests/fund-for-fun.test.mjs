@@ -96,10 +96,10 @@ test('unconfirmed benefits are absent from public output and visible counts excl
   }
 });
 
-test('FUND FOR FUN appears on the sponsorship route, not the volunteer route', () => {
+test('FUND FOR FUN is deferred from the current sponsorship and volunteer routes', () => {
   const sponsorshipPage = partner('../');
   const volunteerPage = partner('../', 'tinh-nguyen-vien');
-  assert.match(sponsorshipPage, /id="fund-for-fun"/);
-  assert.match(sponsorshipPage, /id="quyen-loi"/);
+  assert.match(sponsorshipPage, /id="nha-tai-tro"/);
+  assert.doesNotMatch(sponsorshipPage, /fund-for-fun|Bảng quyền lợi nhà tài trợ/);
   assert.doesNotMatch(volunteerPage, /id="fund-for-fun"/);
 });
