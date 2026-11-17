@@ -184,13 +184,13 @@ document.querySelectorAll('[data-journey]').forEach(root=>{
   io.observe(svg);document.addEventListener('visibilitychange',tryIntro);
 });
 
-// UI-012: tier ladder. The slider picks a tier through its tab, lower tiers get the check mark, "Xem thêm" opens a column, and the compose draft stays in the browser (nothing is sent).
+// UI-012: tier tabs update included markers; "Xem thêm" opens a column and the compose draft stays in the browser.
 document.querySelectorAll('.tier-section').forEach(section=>{
   const list=section.querySelector('[role=tablist]'),cards=[...list.querySelectorAll('[role=tab]')],box=section.querySelector('[data-tier-compose-box]');
   const msg=box.querySelector('textarea'),mail=box.querySelector('[data-tier-mail]'),copy=box.querySelector('[data-copy]'),email=mail.getAttribute('href').replace('mailto:','');
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const range=section.querySelector('.tier-range');
-  range?.addEventListener('input',()=>cards[+range.value].click());
+  range?.addEventListener('input',()=>cards[Number(range.value)].click());
   let picked=null;
   const letter=()=>`Chào POET,\n\nMình là [Tên] từ [Tên thương hiệu]. Thương hiệu mình muốn đồng hành cùng POET trong chiến dịch Big Joy Little Joy. POET gửi giúp mình thông tin chi tiết và lịch trao đổi nhé.\n\nCảm ơn POET!`;
   // Gmail compose in a new tab: a mailto link does nothing on machines without a mail app.
@@ -199,9 +199,14 @@ document.querySelectorAll('.tier-section').forEach(section=>{
   // Follows aria-selected, so tab clicks, arrow keys and deep links all update the ladder the same way.
   const sync=()=>{
     const i=cards.findIndex(c=>c.getAttribute('aria-selected')==='true');
-    cards.forEach((c,k)=>c.classList.toggle('is-included',k<i));
+    cards.forEach((card,k)=>card.classList.toggle('is-included',k<i));
     picked={amount:cards[i].getAttribute('aria-controls').replace('tier-',''),name:cards[i].querySelector('.tier-card__name').textContent};
-    if(range){range.value=i;range.parentElement.style.setProperty('--p',(i/(cards.length-1)).toFixed(4));range.setAttribute('aria-valuetext',`${picked.name} / ${picked.amount} triệu`);section.querySelectorAll('.tier-stop').forEach((d,k)=>d.classList.toggle('is-passed',k<=i));}
+    if(range){
+      range.value=String(i);
+      range.parentElement.style.setProperty('--p',(i/(cards.length-1)).toFixed(4));
+      range.setAttribute('aria-valuetext',`${picked.name} / ${picked.amount} triệu`);
+      section.querySelectorAll('.tier-stop').forEach((stop,k)=>stop.classList.toggle('is-passed',k<=i));
+    }
     if(!box.hidden){msg.value=letter();fill();}
   };
   new MutationObserver(sync).observe(list,{subtree:true,attributes:true,attributeFilter:['aria-selected']});
