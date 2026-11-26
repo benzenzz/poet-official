@@ -2147,9 +2147,10 @@ button.v-card{width:100%;padding:0;border:0;font:inherit;cursor:pointer}
 
 /* FUND FOR FUN comparison table. These rules are separate from the BJLJ .tier-* system. */
 .fund-for-fun{padding-block:var(--site-space)}
-.fund-for-fun__head{max-width:780px;margin:0 auto 28px;text-align:center}
-.fund-for-fun__head h2{margin:8px 0 12px;font-size:var(--type-h2);line-height:1.2;color:var(--poet-ink)}
-.fund-for-fun__head .lead{margin:0 auto;color:var(--poet-muted)}
+.fund-for-fun__head{margin:0 0 28px;text-align:left}
+.fund-for-fun__head .eyebrow{margin:0 0 14px!important}
+.fund-for-fun__head h2{margin:0;font-size:var(--type-h2);line-height:1.12;letter-spacing:-.045em;color:var(--poet-ink);text-wrap:balance}
+.fund-for-fun__head h2 span{color:var(--coral-deep)}
 .sponsor-tier-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;list-style:none;margin:24px 0 0;padding:0}
 .sponsor-tier-row>li{display:flex;min-width:0}
 .sponsor-tier-card{--sponsor-tab-accent:var(--poet-ink);--sponsor-tab-line:var(--poet-border);--sponsor-tab-tint:var(--poet-white);width:100%;min-width:0;min-height:112px;display:grid;align-content:start;gap:4px;padding:16px;text-align:left;font:inherit;color:var(--poet-heading);background:var(--poet-white);border:1px solid var(--poet-border);border-top:4px solid var(--sponsor-tab-line);border-radius:16px;cursor:pointer;transition:box-shadow .2s,background-color .2s,border-color .2s}
