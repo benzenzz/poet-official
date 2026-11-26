@@ -126,9 +126,9 @@ if('IntersectionObserver'in window){
   document.querySelectorAll('[data-counter-group]').forEach(el=>groups.observe(el));
 }
 
-// UI-011: pins drop 01→04 while bé Hoa walks to today's stage and the road tiles light behind her. Runs once, only while the tab is visible.
+// UI-011: pins drop 01→03 while bé Hoa walks to today's stage and the road tiles light behind her. Runs once, only while the tab is visible.
 document.querySelectorAll('[data-journey]').forEach(root=>{
-  const stages=JSON.parse(root.querySelector('[data-journey-data]').textContent),NS='http://www.w3.org/2000/svg',AT=[.09,.42,.745,.995],TILE=36;
+  const stages=JSON.parse(root.querySelector('[data-journey-data]').textContent),NS='http://www.w3.org/2000/svg',AT=[.16,.58,.995],TILE=36;
   const svg=root.querySelector('.journey-board svg'),road=svg.querySelector('.road'),L=road.getTotalLength(),hoa=svg.querySelector('[data-journey-hoa]'),ov=root.querySelector('.journey-overlay');
   const today=Date.now(),cur=stages.reduce((c,s,i)=>today>=Date.parse(s.start+'T00:00:00+07:00')?i:c,0);
   const P=(x,y)=>({x:(x-y)*.866,y:(x+y)*.5}),on=len=>{const q=road.getPointAtLength(Math.max(0,Math.min(L,len)));return P(q.x,q.y);};
@@ -139,7 +139,9 @@ document.querySelectorAll('[data-journey]').forEach(root=>{
   const e=P(520,70),st=P(70,530);
   svg.querySelector('.journey-flag').innerHTML=`<line x1="${e.x+34}" y1="${e.y-6}" x2="${e.x+34}" y2="${e.y-86}" stroke="#7a6a52" stroke-width="4" stroke-linecap="round"/><path d="M${e.x+36} ${e.y-86} l44 12 l-44 14 z" fill="var(--poet-yellow)" stroke="#c98a00" stroke-width="2"/><ellipse cx="${st.x}" cy="${st.y+2}" rx="30" ry="14" fill="none" stroke="#9d9586" stroke-width="2" stroke-dasharray="4 5"/>`;
   const tip=document.createElement('div');tip.className='journey-tip';tip.setAttribute('aria-hidden','true');ov.append(tip);
-  const pts=AT.map(a=>on(L*a)),pins=[],leads=[],labels=[];
+  const pts=AT.slice(0,stages.length).map(a=>on(L*a)),pins=[],leads=[],labels=[];
+  const flagAnchor={x:e.x+34,y:e.y};
+  if(pts.length===3)pts[2]=flagAnchor;
   const show=i=>{pins.forEach((g,j)=>g.classList.toggle('open',j===i));tip.innerHTML=`<small>${tag(i)}</small>${stages[i].note}`;Object.assign(tip.style,pct(pts[i].x,pts[i].y-(i===cur?118:80)));tip.classList.add('show');labels.forEach((l,j)=>{l.style.visibility=j===i?'hidden':'';});};
   const hide=()=>{pins.forEach(g=>g.classList.remove('open'));tip.classList.remove('show');labels.forEach(l=>{l.style.visibility='';});};
   const isOpen=i=>tip.classList.contains('show')&&pins[i].classList.contains('open');
@@ -223,6 +225,12 @@ document.querySelectorAll('.tier-section').forEach(section=>{
     btn.querySelector('span').textContent=open?'Thu gọn':`Xem thêm ${phase.querySelectorAll('li.is-more').length} quyền lợi`;
   }));
 });
+
+document.querySelectorAll('.sponsor-benefit-toggle').forEach(btn=>btn.addEventListener('click',()=>{
+  const phase=btn.closest('.sponsor-benefit-phase'),open=phase.classList.toggle('open');
+  btn.setAttribute('aria-expanded',String(open));
+  btn.querySelector('span:last-child').textContent=open?'Thu gọn':`Xem thêm ${phase.querySelectorAll('li.is-more').length} quyền lợi`;
+}));
 
 // UI-018: countdown on the campaign card. The build renders the same state; this recalculates it in Vietnam time on load.
 document.querySelectorAll('[data-campaign-timeline]').forEach(el=>{
@@ -460,3 +468,16 @@ if(wall){
     sync();
   }
 }
+
+// Fund For Fun: keyboard-operable tier selection shared across desktop and mobile.
+document.querySelectorAll('[data-fff-tiers]').forEach(group=>{
+  const buttons=[...group.querySelectorAll('[data-fff-tier]')];
+  const select=button=>{buttons.forEach(item=>{const active=item===button;item.setAttribute('aria-checked',String(active));item.tabIndex=active?0:-1;});group.closest('.fund-for-fun')?.querySelectorAll('[data-fff-panel]').forEach(panel=>{panel.hidden=panel.dataset.fffPanel!==button.dataset.fffTier;});};
+  buttons.forEach((button,index)=>{button.addEventListener('click',()=>select(button));button.addEventListener('keydown',event=>{let next=index;if(event.key==='ArrowRight'||event.key==='ArrowDown')next=(index+1)%buttons.length;else if(event.key==='ArrowLeft'||event.key==='ArrowUp')next=(index+buttons.length-1)%buttons.length;else if(event.key==='Home')next=0;else if(event.key==='End')next=buttons.length-1;else return;event.preventDefault();buttons[next].focus();select(buttons[next]);});});
+});
+
+document.querySelectorAll('[data-fff-more]').forEach(btn=>btn.addEventListener('click',()=>{
+  const phase=btn.closest('.fund-for-fun__phase'),open=phase.classList.toggle('open');
+  btn.setAttribute('aria-expanded',String(open));
+  btn.querySelector('span').textContent=open?'Thu gọn':`Xem thêm ${phase.querySelectorAll('li.is-more').length} quyền lợi`;
+}));

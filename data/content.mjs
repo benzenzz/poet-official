@@ -55,7 +55,7 @@ export const season = {
   narrative: [
     'Sau một thời gian chuẩn bị cho mùa hoạt động mới, POET chính thức lựa chọn Điểm trường thuộc Trường Tiểu học & Trung học cơ sở Hoàng Văn Thụ, xã Ea Kiết, tỉnh Đắk Lắk làm điểm đến cho mùa POET 2026–2027.',
     'Cũng qua chuyến tiền trạm ấy, POET nhận ra rằng điều kiện cơ sở vật chất, không gian để các em vui chơi, vận động vẫn còn khá hạn chế. Vì vậy, POET dự định tổ chức “Công viên niềm vui” tại điểm trường — các góc vui chơi, trải nghiệm và vận động; đồng thời cải thiện không gian sinh hoạt tại trường, để mỗi ngày đến trường của các em có thêm nhiều niềm vui và những kỷ niệm đáng nhớ.',
-    'Hành trình gây quỹ của POET được xây dựng qua chuỗi hoạt động xuyên suốt, bao gồm quỹ Big Joy Little Joy, bộ sưu tập Young Joy Collection, không gian trải nghiệm Big Joy Pop-up (dự kiến diễn ra vào cuối tháng 12), cùng các chương trình kêu gọi tài trợ và quyên góp từ cộng đồng. Khép lại chuỗi sự kiện gây quỹ, POET sẽ thực hiện chuyến đi thực tế Final Trip đến điểm trường để trực tiếp trao tặng những món quà ý nghĩa và cùng các em nhỏ hòa mình vào các hoạt động giao lưu đầy thú vị tại sân chơi.'
+    'Hành trình gây quỹ của POET được xây dựng qua chuỗi hoạt động xuyên suốt, bao gồm quỹ Big Joy Little Joy, bộ sưu tập Young Joy Collection và các chương trình kêu gọi tài trợ, quyên góp từ cộng đồng. POET sẽ thực hiện chuyến đi thực tế Final Trip đến điểm trường để trực tiếp trao tặng những món quà ý nghĩa và cùng các em nhỏ hòa mình vào các hoạt động giao lưu đầy thú vị tại sân chơi.'
   ],
   destinationPhotos: [], // Add only approved, identified Mùa 6 school photos.
   school: 'Trường Tiểu học & Trung học cơ sở Hoàng Văn Thụ',
@@ -93,7 +93,6 @@ export const campaignStory = {
     'Quỹ **Big Joy Little Joy**',
     'Kêu gọi tài trợ và kêu gọi quyên góp từ cộng đồng',
     'Bộ sưu tập **Young Joy Collection** (Đang trong quá trình thực hiện)',
-    'Không gian trải nghiệm **Big Joy Pop-up** (Dự kiến: Cuối tháng 12/2026)',
     'Chuyến đi cuối cùng đến điểm trường (Dự kiến: Tháng 01/2027)'
   ]
 };
@@ -101,14 +100,13 @@ export const campaignStory = {
 // Dossier p10. Planned dates. start = ngày bắt đầu chặng, dùng để tính bé Hoa đang ở đâu (UI-011)
 export const journeyIntro = {
   eyebrow: 'Lộ trình Big Joy Little Joy',
-  title: 'Bốn chặng,<br>cùng một điểm đến.',
-  text: 'Kế hoạch 4 giai đoạn từ 09/2026 đến 01/2027, đi cùng các Little Joy từ ngày đầu tới chuyến trao quà.',
+  title: 'Ba chặng,<br>cùng một điểm đến.',
+  text: 'Kế hoạch 3 giai đoạn từ 09/2026 đến 01/2027, đi cùng các Little Joy từ ngày đầu tới chuyến trao quà.',
   nowLabel: 'Bé Hoa đang ở'
 };
 export const journey = [
   { name: 'Onboard', date: '09/2026', start: '2026-09-01', note: 'Little Joy tham gia cùng POET, trở thành một phần của hành trình tạo nên Big Joy.' },
   { name: 'Collect The Little Joys', date: '10–12/2026', start: '2026-10-01', note: 'Little Joy đóng góp một phần doanh thu và cùng POET lan tỏa Little Joy đến cộng đồng.' },
-  { name: 'Big Joy Pop Up', date: '20–22/12/2026', start: '2026-12-20', note: 'Little Joy mang sản phẩm đến Pop-up bán hàng, giao lưu & kết nối cùng cộng đồng.' },
   { name: 'Joy, Delivered', date: season.trip, start: '2027-01-22', note: 'Những đóng góp nhỏ cùng nhau tạo thành Big Joy: Công viên Niềm Vui dành cho cộng đồng.' }
 ];
 export const activities = [
@@ -200,19 +198,41 @@ export const socials = [
 // BJLJ tiers and benefit cells transcribed from the supplied source PDF.
 // Rows with unresolved phase or tier placement remain in the data map but are not rendered.
 export const tiers = [
-  {amount:1,name:'BABY STEP',tagline:'Bước đầu tiên để thương hiệu có mặt trong hành trình.',booth:null,popTickets:0,tripTickets:0,phases:[
-    ['Bài công bố chung sự tham gia của Little Joy trên Facebook và Instagram theo từng tuần.','Sử dụng ảnh tiền trạm trong 12 tháng, theo phạm vi hai bên thống nhất.','Cập nhật tiến độ gây quỹ và quyền lợi.'],
-    ['Phát voucher của Little Joy kèm vé tham dự Pop Up.'],
-    ['Chứng nhận đồng hành sau khi hoàn tất nghĩa vụ.','Ưu tiên đối tác CSR và ưu đãi gói đồng hành chương trình tiếp theo.','Cơ hội đồng sáng tạo hoạt động cộng đồng cùng POET.']]},
-  {amount:3,name:'SPARK',tagline:'Có mặt tại Pop Up và trong bài recap chung.',booth:null,popTickets:1,tripTickets:0,phases:[['Được nhắc trong bình luận các bài cập nhật cột mốc 30, 50 và 100 triệu đồng.'],['1 vé tham dự Pop Up miễn phí.','Xuất hiện trong bài recap chung Pop Up trên Facebook và Instagram.','Sử dụng bộ ảnh Pop Up trong 12 tháng từ khi nhận, theo phạm vi thống nhất.'],[]]},
-  {amount:5,name:'GROW',tagline:'Có quầy hàng riêng và video giới thiệu sản phẩm.',booth:'5m²',popTickets:1,tripTickets:0,phases:[['1 video UGC 20–30 giây do team POET thực hiện, đăng trên kênh Creator team POET.'],['Không gian quầy hàng 5 m².','Xuất hiện 5 giây trong video recap Pop Up chung.'],[]]},
-  {amount:10,name:'RISE',tagline:'Bài công bố riêng và bộ nội dung sản phẩm đầy đủ hơn.',booth:'5m²',popTickets:2,tripTickets:0,phases:[['Bài công bố riêng trên Facebook và Instagram; 1 bài giới thiệu nổi bật trên Facebook POET.','1 video TikTok 30 giây có nhắc đến Little Joy.','3 video unboxing túi quà của Creator POET, đăng trên kênh Creator.','Bộ 10 ảnh sản phẩm và trải nghiệm; địa điểm chụp trong TP. Hồ Chí Minh.'],['Tổng 2 vé Pop Up; logo bằng 1/5 logo POET trên ấn phẩm tại sự kiện.','1 video UGC dưới 30 giây trên kênh Creator team POET.'],['Xuất hiện trong bài recap chung chuyến đi trên Facebook và Instagram POET.']]},
-  {amount:15,name:'SHINE',tagline:'Thêm unboxing trên kênh POET và quyền dùng ảnh chuyến đi.',booth:'5m²',popTickets:2,tripTickets:0,phases:[['1 video POET unboxing túi quà, đăng trên kênh POET.'],['Tổng 10 giây trong video recap Pop Up chung.','1 story nhắc Little Joy chung trên Instagram POET.'],['Sử dụng ảnh và video chuyến đi trong 12 tháng từ khi nhận, theo phạm vi thống nhất.']]},
-  {amount:20,name:'TURNING POINT',tagline:'Bắt đầu có KOC và bài recap riêng sau chuyến đi.',booth:'5m²',popTickets:2,tripTickets:0,phases:[['1 video dưới 60 giây do KOC thực hiện và đăng trên kênh KOC.','Tổng 3 video lồng ghép sản phẩm, 20–30 giây/video, trên kênh Creator team POET.'],['1 story riêng trên Instagram POET.'],['1 bài recap riêng chuyến đi trên Facebook và Instagram POET.']]},
-  {amount:25,name:'THRIVE',tagline:'Quầy rộng hơn, logo lớn hơn, recap Pop Up riêng.',booth:'8m²',popTickets:3,tripTickets:0,phases:[['Tổng 2 video TikTok 30 giây có nhắc đến Little Joy.'],['Quầy hàng 8 m²; tổng 3 vé tham dự Pop Up.','Logo bằng 1/2 logo POET trên ấn phẩm sự kiện.','1 bài recap Pop Up riêng trên Instagram và 1 video recap Little Joy 30 giây.'],['Xuất hiện 5 giây trong video recap chuyến đi.']]},
-  {amount:30,name:'SPREAD',tagline:'Đại diện thương hiệu cùng lên đường trao quà.',booth:'8m²',popTickets:3,tripTickets:1,phases:[['Tổng 2 video do KOC thực hiện và đăng trên kênh KOC.'],['Ưu tiên lựa chọn vị trí quầy; tổng 2 story riêng.','Thêm 1 video UGC dưới 30 giây trên kênh Creator team POET.'],['1 vé tham gia chuyến đi, gồm ăn uống, di chuyển và ở.','Đại diện chia sẻ 2 phút và tham gia trao tặng, bàn giao.','1 story riêng chuyến đi; bộ 10 ảnh thương hiệu tại chuyến đi.']]},
-  {amount:35,name:'AMPLIFY',tagline:'Khuếch đại trải nghiệm trực tiếp và thêm một người cùng lên đường.',booth:'8m²',popTickets:3,tripTickets:2,phases:[[],[],['Tổng 2 vé tham gia chuyến đi, gồm ăn uống, di chuyển và ở.']]},
-  {amount:40,name:'TRIUMPH',tagline:'Độc quyền ngành hàng và hiện diện đầy đủ nhất.',booth:'8m²',popTickets:4,tripTickets:3,phases:[['Tổng 3 video TikTok POET; tổng 5 video KOC.','Tổng 5 video lồng ghép sản phẩm trên kênh Creator team POET.'],['Ưu tiên độc quyền ngành hàng.','Hỗ trợ quầy tiêu chuẩn với ngân sách dưới 1 triệu đồng; phần thiết kế riêng ngoài phạm vi hỗ trợ do thương hiệu chi trả.','Tổng 4 vé Pop Up; logo bằng kích thước logo POET.','Tổng 3 story riêng; thêm 3 video Pop Up trên kênh Creator team POET.'],['Tổng 3 vé chuyến đi, gồm ăn uống, di chuyển và ở.','Cơ hội người thụ hưởng trải nghiệm sản phẩm trong chương trình.','1 video recap riêng Little Joy.']]}
+  {amount:1,name:'BABY STEP',tagline:'Bước đầu tiên để thương hiệu có mặt trong hành trình.',tripTickets:0,phases:[
+    ['Bài công bố chung sự tham gia của Little Joy trên Facebook và Instagram theo từng tuần.','Bài collab Little Joy x POET trên Facebook và Threads.','Cung cấp hình ảnh chuyến tiền trạm.','Quyền sử dụng hình ảnh tiền trạm trong 12 tháng theo phạm vi hai bên thống nhất.','Cập nhật tiến độ gây quỹ và quyền lợi qua nhóm chat và email.'],
+    [],
+    ['Chứng nhận ghi nhận sự đồng hành của Little Joy.','Ưu tiên trở thành đối tác CSR trong các chương trình tiếp theo.','Ưu đãi gói đồng hành trong các chương trình tiếp theo.','Cơ hội đồng sáng tạo hoạt động cộng đồng cùng POET.']]},
+  {amount:3,name:'SPARK',tagline:'Nhắc tên thương hiệu trong hành trình lan toả.',tripTickets:0,phases:[
+    ['Nhắc đến trong phần bình luận các bài cập nhật cột mốc 30, 50 và 100 triệu đồng trên Facebook và Instagram.','1 bài creator collab Little Joy x POET trên Threads.'],
+    [],[]]},
+  {amount:5,name:'GROW',tagline:'Được giới thiệu bằng video trên kênh nội dung của POET.',tripTickets:0,phases:[
+    ['1 video TikTok 30 giây của POET có nhắc đến Little Joy.','2 bài creator collab Little Joy x POET trên Threads.','1 video 20–30 giây do team POET thực hiện, lồng ghép sản phẩm tự nhiên trên kênh Creator team POET.'],
+    [],[]]},
+  {amount:10,name:'RISE',tagline:'Có bài công bố riêng và bộ nội dung sản phẩm đầy đủ hơn.',tripTickets:0,phases:[
+    ['Bài công bố riêng sự tham gia của Little Joy trên Facebook và Instagram.','1 bài giới thiệu nổi bật trên Facebook POET.','1 bài collab TikTok/creator thêm.','3 video unboxing từ Creator POET đăng trên kênh Creator.','Bộ ảnh sản phẩm và trải nghiệm khoảng 10 tấm, trong phạm vi TP. Hồ Chí Minh.','1 video KOC dưới 30 giây giới thiệu và trải nghiệm sản phẩm.'],
+    [],['Little Joy xuất hiện trong bài recap chuyến đi chung trên Facebook và Instagram POET.']]},
+  {amount:15,name:'SHINE',tagline:'Thêm video unboxing POET và quyền dùng hình ảnh chuyến đi.',tripTickets:0,phases:[
+    ['1 video POET unboxing túi quà, trong đó sản phẩm của Little Joy được giới thiệu trên kênh POET.','1 video KOC dưới 30 giây giới thiệu và trải nghiệm sản phẩm.','Tăng lên 3 bài creator collab trên Threads.'],
+    [],['Cung cấp hình ảnh không gian và hoạt động tại chuyến đi.','Cung cấp source video chuyến đi.','Quyền sử dụng hình ảnh và video chuyến đi trong 12 tháng kể từ ngày POET gửi tư liệu.']]},
+  {amount:20,name:'TURNING POINT',tagline:'Bắt đầu có nội dung KOC dài và bài recap riêng sau chuyến đi.',tripTickets:0,phases:[
+    ['1 video tối đa 60 giây do KOC thực hiện và đăng trên kênh KOC.','Tổng 3 video 20–30 giây do team POET thực hiện, lồng ghép sản phẩm trên kênh Creator team POET.'],
+    [],['1 bài recap riêng chuyến đi trên Facebook và Instagram POET.']]},
+  {amount:25,name:'THRIVE',tagline:'Mở rộng nội dung video và quyền lợi hiện diện sau chuyến đi.',tripTickets:1,phases:[
+    ['Tổng 2 video TikTok 30 giây của POET có nhắc đến Little Joy.','1 video tối đa 60 giây do KOC thực hiện.','Tổng 3 video 20–30 giây do team POET thực hiện.'],
+    ['1 vé tham gia chuyến đi thiện nguyện, gồm ăn uống, di chuyển và ở.'],
+    ['Little Joy xuất hiện trong bài recap chuyến đi chung và riêng trên Facebook và Instagram POET.','Nhắc đến Little Joy trong IG Story của POET tại chuyến đi.']]},
+  {amount:30,name:'SPREAD',tagline:'Đại diện thương hiệu cùng tham gia trao tặng và kể câu chuyện.',tripTickets:1,phases:[
+    ['Tổng 2 video do KOC thực hiện.','Tổng 3 bài creator collab trên Threads.'],
+    ['1 vé tham gia chuyến đi thiện nguyện, gồm ăn uống, di chuyển và ở.','Đại diện Little Joy chia sẻ câu chuyện đồng hành trên sân khấu trong 2 phút.','Tham gia trao tặng và bàn giao thành quả.'],
+    ['Xuất hiện 5 giây trong video recap chuyến đi chung.','Bộ ảnh thương hiệu và sản phẩm tại chuyến đi khoảng 10 tấm.']]},
+  {amount:35,name:'AMPLIFY',tagline:'Tăng số người đại diện tham gia và mức độ lan tỏa sau chuyến đi.',tripTickets:2,phases:[
+    ['Tổng 2 video do KOC thực hiện.','Tổng 3 bài creator collab trên Threads.'],
+    ['2 vé tham gia chuyến đi thiện nguyện, gồm ăn uống, di chuyển và ở.','Đại diện Little Joy chia sẻ câu chuyện đồng hành trên sân khấu trong 2 phút.','Tham gia trao tặng và bàn giao thành quả.'],
+    ['Nhắc đến Little Joy riêng trên IG Story của POET; mỗi story tối đa 10 giây.','Tiếp tục được hiện diện trong nội dung recap chung và riêng của POET.']]},
+  {amount:40,name:'TRIUMPH',tagline:'Được hiện diện đầy đủ nhất trong toàn bộ hành trình.',tripTickets:3,phases:[
+    ['Tổng 3 video TikTok 30 giây của POET có nhắc đến Little Joy.','Tổng 5 video tối đa 60 giây do KOC thực hiện.','Tổng 5 video 20–30 giây do team POET thực hiện.','Tổng 5 bài creator collab Little Joy x POET trên Threads.','3 video unboxing KOC trên kênh KOC.'],
+    ['3 vé tham gia chuyến đi thiện nguyện, gồm ăn uống, di chuyển và ở.','Đại diện tham gia trao tặng và chia sẻ câu chuyện đồng hành.','Cơ hội để người thụ hưởng trải nghiệm sản phẩm của Little Joy.'],
+    ['1 video recap riêng chuyến đi 30 giây trên kênh POET.','1 bộ ảnh thương hiệu và sản phẩm tại chuyến đi khoảng 10 tấm.']]}
 ];
 
 // Source-derived BJLJ mapping. Unresolved rows remain stored for traceability and are not rendered.
@@ -280,17 +300,14 @@ export const tierIntro = {
   title: 'Hành trình niềm vui<br><span>bắt đầu.</span>',
   text: 'Hành trình tài trợ linh hoạt với <b>10 cột mốc từ 1.000.000 đến 40.000.000 VNĐ</b>.',
   phases: [
-    ['01 / Trước sự kiện', 'Lan toả trên mạng xã hội'],
-    ['02 / Pop Up · 20–22.12.2026', 'Chạm nhau ngoài đời'],
-    ['03 / Chuyến đi · ' + season.trip.replace(/\//g, '.'), 'Để niềm vui đi xa']
+    ['01 / Trước chuyến đi', 'Lan tỏa trên mạng xã hội'],
+    ['02 / Chuyến đi · ' + season.trip.replace(/\//g, '.'), 'Để niềm vui đi xa'],
+    ['03 / Sau khi đồng hành', 'Ghi nhận và hợp tác dài hạn']
   ]
 };
 
 // Higher tiers replace earlier benefits when the offer changes, such as a ticket count increasing.
-export const tierReplaced = {
-  '1.1.0':3, '2.1.0':6, '2.1.1':4, '3.1.0':6, '3.0.1':6, '3.2.0':5, '5.0.0':7, '5.1.0':7,
-  '6.0.0':9, '7.0.0':9, '5.0.1':9, '6.1.0':9, '6.1.1':9, '7.2.0':8, '8.2.0':9
-};
+export const tierReplaced = {};
 
 // Partner page, sponsor panel + contact (UI-013)
 export const sponsorIntro = {
