@@ -331,7 +331,7 @@ poet-nav.site-nav{display:block;position:sticky;top:0;z-index:50;height:80px;bac
 .tier-stat small{display:block;margin-top:6px;font-size:14px;line-height:1.5;color:var(--tier-ink-soft)}
 .tier-stat.s0{background:var(--tier-tile)}
 .tier-stat.s1{background:var(--tier-blue-soft)}
-.tier-stat.s2{background:var(--tier-mint)}
+.tier-stat.s2{background:var(--tier-yellow-soft)}
 .tier-stat.is-off b{color:#8a8175}
 .tier-phases{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(18px,2.4vw,32px);margin-top:28px}
 .tier-phases[data-visible-phases="1"]{grid-template-columns:minmax(0,1fr)}
