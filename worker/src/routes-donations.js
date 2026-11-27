@@ -148,34 +148,41 @@ export async function handleCreateDonation(request, env) {
 const PUBLIC_CACHE_SECONDS = 30;
 
 /**
- * Public wall, cached at the edge for 30s (caches.default) so a busy page
- * does not hit D1 on every load. Falls back to a direct read if the Cache
- * API is unavailable. Response contains no order codes or bank fields.
+ * First public-wall batch is cached at the edge for 30s. Older batches are
+ * read directly so publish/hide changes do not leave stale later pages.
+ * Response contains no order codes or bank fields.
  */
 export const PUBLIC_SORTS = ['new', 'amount'];
 
-function publicCacheKey(origin, sort) {
-  return new Request(sort === 'new' ? `${origin}/api/donations` : `${origin}/api/donations?sort=${sort}`);
+function publicCacheKey(origin, sort, offset = 0) {
+  const params = new URLSearchParams();
+  if (sort !== 'new') params.set('sort', sort);
+  if (offset > 0) params.set('offset', String(offset));
+  const query = params.toString();
+  return new Request(`${origin}/api/donations${query ? `?${query}` : ''}`);
 }
 
 export async function handleListPublic(env, ctx, url) {
   const sort = url.searchParams.get('sort') || 'new';
   if (!PUBLIC_SORTS.includes(sort)) return error('Kiểu sắp xếp không hợp lệ.', 400);
+  const offsetText = url.searchParams.get('offset') || '0';
+  const offset = Number(offsetText);
+  if (!Number.isSafeInteger(offset) || offset < 0) return error('Vị trí lời nhắn không hợp lệ.', 400);
   // Key on the Worker's real host so the Cache API actually matches in prod.
-  // One key per sort; any other query params are ignored.
-  const cacheKey = publicCacheKey(url.origin, sort);
-  const cache = typeof caches !== 'undefined' ? caches.default : null;
+  // Cache the first window; later windows stay fresh after publish/hide.
+  const cacheKey = publicCacheKey(url.origin, sort, offset);
+  const cache = offset === 0 && typeof caches !== 'undefined' ? caches.default : null;
   if (cache) {
     try {
       const hit = await cache.match(cacheKey);
       if (hit) return new Response(hit.body, hit);
     } catch {}
   }
-  const { donations, totalAmount, totalCount, fundraising } = await listPublicDonations(env, sort);
+  const { donations, totalAmount, totalCount, fundraising } = await listPublicDonations(env, sort, offset);
   const res = json(
     { donations, totalAmount, totalCount, fundraising },
     200,
-    { 'Cache-Control': `public, max-age=${PUBLIC_CACHE_SECONDS}` },
+    { 'Cache-Control': offset === 0 ? `public, max-age=${PUBLIC_CACHE_SECONDS}` : 'no-store' },
   );
   if (cache) {
     const put = cache.put(cacheKey, res.clone()).catch(() => {});

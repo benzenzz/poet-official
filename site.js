@@ -394,8 +394,8 @@ if(wall){
   const board=wall.closest('[data-board]'),pagesNav=board.querySelector('[data-wall-pages]'),prev=board.querySelector('[data-wall-prev]'),next=board.querySelector('[data-wall-next]'),range=board.querySelector('[data-wall-range]'),retry=board.querySelector('[data-wall-retry]'),search=board.querySelector('[data-wall-search]'),sortButtons=[...board.querySelectorAll('[data-wall-sort]')],count=document.querySelector('[data-wall-count]');
   const iconBase=wall.dataset.iconBase,papers=wall.dataset.papers.split(' '),glyphs=wall.dataset.glyphs.split(' ');
   const phone=matchMedia('(max-width:640px)');
-  const cache={},fold=s=>s.normalize('NFD').replace(/\p{M}/gu,'').replace(/đ/gi,'d').toLowerCase();
-  let sort='new',query='',page=1,loaded=false,list=[];
+  const cache=Object.create(null),totals=Object.create(null),pending=Object.create(null),fold=s=>s.normalize('NFD').replace(/\p{M}/gu,'').replace(/đ/gi,'d').toLowerCase();
+  let sort='new',query='',page=1,loaded=false,list=[],navigation=0;
   // Test mode until TODO(UI-009-backend): notes written in the composer stay in this browser only.
   const LOCAL_KEY='poet-wall-test-notes';
   const readLocal=()=>{try{const v=JSON.parse(localStorage.getItem(LOCAL_KEY)||'[]');return Array.isArray(v)?v.map(n=>({...n,local:true})):[];}catch{return [];}};
@@ -415,6 +415,34 @@ if(wall){
   }
   const fromDonation=d=>{const h=hash(`${d.displayName||''}|${d.paidAt||''}`);return{name:nameOf(d),place:'',message:d.message||'Một đóng góp gửi đến POET.',paper:papers[h%papers.length],glyph:glyphs.includes(d.sticker)?d.sticker:glyphs[Math.floor(h/papers.length)%glyphs.length],amount:Number(d.amount),when:ago(d.paidAt)};};
   const state=text=>{wall.replaceChildren(el('p','wall-state',text));};
+  function syncCount(which){
+    if(Number.isFinite(totals[which])){count.textContent=`${new Intl.NumberFormat('vi-VN').format(totals[which])} lời nhắn`;count.hidden=false;}
+  }
+  async function fetchBatch(which){
+    cache[which]??=[];
+    if(Number.isFinite(totals[which])&&cache[which].length>=totals[which])return;
+    if(pending[which])return pending[which];
+    const offset=cache[which].length;
+    const task=(async()=>{
+      const response=await fetch(`${window.POETCheckout.API_BASE}/api/donations?sort=${which}&offset=${offset}`,{signal:AbortSignal.timeout(10000)});
+      if(!response.ok)throw new Error('Unable to load message batch');
+      const data=await response.json(),rows=Array.isArray(data.donations)?data.donations:[];
+      cache[which].push(...rows);
+      if(Number.isSafeInteger(Number(data.totalCount))&&Number(data.totalCount)>=0)totals[which]=Number(data.totalCount);
+      syncCount(which);
+      return rows.length;
+    })();
+    pending[which]=task;
+    try{return await task;}finally{if(pending[which]===task)delete pending[which];}
+  }
+  async function ensureLoaded(required,which){
+    while(cache[which].length<Math.min(required,totals[which]??required)){
+      const before=cache[which].length;
+      await fetchBatch(which);
+      if(cache[which].length===before)throw new Error('No more message batches available');
+    }
+  }
+  async function ensureAll(which){await ensureLoaded(totals[which]??cache[which].length,which);}
   function pageList(total,cur){
     if(phone.matches)return Array.from({length:Math.min(3,total)},(_,i)=>Math.max(1,Math.min(cur-1,total-2))+i); // narrow row: current page and its neighbours only
     if(total<=7)return Array.from({length:total},(_,i)=>i+1);
@@ -423,23 +451,32 @@ if(wall){
   // Centre the outside arrows on the notes (desktop) or on the page-number row (phone).
   function placeArrows(){const target=phone.matches?pagesNav:wall,b=board.getBoundingClientRect(),r=target.getBoundingClientRect();board.style.setProperty('--wall-nav-y',`${r.top-b.top+r.height/2}px`);}
   function render(){
-    const per=phone.matches?3:6,q=fold(query.trim()),shown=q?list.filter(d=>fold(d.local?d.name:nameOf(d)).includes(q)):list,total=Math.max(1,Math.ceil(shown.length/per));
+    const per=phone.matches?3:6,q=fold(query.trim()),shown=q?list.filter(d=>fold(d.local?d.name:nameOf(d)).includes(q)):list,localCount=readLocal().length,totalItems=q?shown.length:localCount+(Number.isFinite(totals[sort])?totals[sort]:(cache[sort]||[]).length),total=Math.max(1,Math.ceil(totalItems/per));
     page=Math.min(page,total);
-    if(!list.length)state(wall.dataset.empty);else if(!shown.length)state(wall.dataset.noMatch);
+    if(!totalItems)state(q?wall.dataset.noMatch:wall.dataset.empty);
     else wall.replaceChildren(...shown.slice((page-1)*per,page*per).map(d=>noteCard(d.local?{...d,when:ago(d.paidAt)}:fromDonation(d))));
-    range.textContent=shown.length?`${(page-1)*per+1}–${Math.min(page*per,shown.length)} / ${shown.length} lời nhắn`:'';
-    pagesNav.replaceChildren(...(shown.length>per?pageList(total,page):[]).map(n=>{if(n==='…')return el('span','wall-gap','…');const b=el('button');b.type='button';b.textContent=n;b.setAttribute('aria-label',`Trang ${n}`);if(n===page)b.setAttribute('aria-current','page');b.addEventListener('click',()=>go(n));return b;}));
-    prev.hidden=next.hidden=shown.length<=per;prev.disabled=page<=1;next.disabled=page>=total;placeArrows();
+    range.textContent=totalItems?`${(page-1)*per+1}–${Math.min(page*per,totalItems)} / ${totalItems} lời nhắn`:'';
+    pagesNav.replaceChildren(...(totalItems>per?pageList(total,page):[]).map(n=>{if(n==='…')return el('span','wall-gap','…');const b=el('button');b.type='button';b.textContent=n;b.setAttribute('aria-label',`Trang ${n}`);if(n===page)b.setAttribute('aria-current','page');b.addEventListener('click',()=>go(n));return b;}));
+    prev.hidden=next.hidden=totalItems<=per;prev.disabled=page<=1;next.disabled=page>=total;placeArrows();
   }
-  function go(n){page=n;render();if(board.getBoundingClientRect().top<0)board.scrollIntoView({block:'start',behavior:reduced.matches?'auto':'smooth'});}
+  async function go(n){
+    const per=phone.matches?3:6,localCount=readLocal().length,totalItems=localCount+(Number.isFinite(totals[sort])?totals[sort]:(cache[sort]||[]).length),total=Math.max(1,Math.ceil(totalItems/per)),target=Math.max(1,Math.min(total,Math.floor(Number(n)||1))),request=++navigation;
+    page=target;retry.hidden=true;
+    if(!query.trim())try{await ensureLoaded(Math.max(0,target*per-localCount),sort);}catch{if(request!==navigation)return;list=[...readLocal(),...(cache[sort]||[])];render();state(wall.dataset.error);retry.hidden=false;return;}
+    if(request!==navigation)return;
+    list=[...readLocal(),...(cache[sort]||[])];render();
+  }
   async function load(){
-    retry.hidden=true;
-    if(!cache[sort]){state('Đang tải lời nhắn…');try{const response=await fetch(`${window.POETCheckout.API_BASE}/api/donations?sort=${sort}`,{signal:AbortSignal.timeout(10000)});if(!response.ok)throw new Error();const data=await response.json();cache[sort]=(Array.isArray(data.donations)?data.donations:[]).filter(d=>Number.isFinite(Number(d.amount))&&Number(d.amount)>0);if(Number.isFinite(Number(data.totalCount))){count.textContent=`${new Intl.NumberFormat('vi-VN').format(Number(data.totalCount))} lời nhắn`;count.hidden=false;}}catch{const mine=readLocal();if(mine.length){loaded=true;list=mine;render();retry.hidden=false;return;}state(wall.dataset.error);retry.hidden=false;return;}}
-    loaded=true;list=[...readLocal(),...cache[sort]];render();
+    const which=sort,request=++navigation;retry.hidden=true;
+    if(!Number.isFinite(totals[which])&&!(cache[which]?.length)){state('Đang tải lời nhắn…');try{await fetchBatch(which);}catch{if(request!==navigation)return;const mine=readLocal();if(mine.length){loaded=true;list=mine;render();retry.hidden=false;return;}state(wall.dataset.error);retry.hidden=false;return;}}
+    if(request!==navigation||which!==sort)return;
+    loaded=true;list=[...readLocal(),...(cache[which]||[])];
+    if(query.trim())try{await ensureAll(which);}catch{if(request!==navigation)return;render();state(wall.dataset.error);retry.hidden=false;return;}
+    if(request===navigation&&which===sort){list=[...readLocal(),...(cache[which]||[])];render();}
   }
-  prev.addEventListener('click',()=>go(page-1));next.addEventListener('click',()=>go(page+1));retry.addEventListener('click',load);
-  sortButtons.forEach(b=>b.addEventListener('click',()=>{if(b.dataset.wallSort===sort)return;sort=b.dataset.wallSort;page=1;sortButtons.forEach(x=>x.setAttribute('aria-pressed',x===b));load();}));
-  let typing;search.addEventListener('input',()=>{clearTimeout(typing);typing=setTimeout(()=>{query=search.value;page=1;if(loaded)render();},150);});
+  prev.addEventListener('click',()=>go(page-1));next.addEventListener('click',()=>go(page+1));retry.addEventListener('click',()=>loaded&&Number.isFinite(totals[sort])&&!query.trim()?go(page):load());
+  sortButtons.forEach(b=>b.addEventListener('click',()=>{if(b.dataset.wallSort===sort)return;navigation++;sort=b.dataset.wallSort;page=1;sortButtons.forEach(x=>x.setAttribute('aria-pressed',x===b));load();}));
+  let typing;search.addEventListener('input',()=>{clearTimeout(typing);typing=setTimeout(async()=>{query=search.value;page=1;if(loaded){navigation++;retry.hidden=true;if(query.trim())try{await ensureAll(sort);}catch{list=[...readLocal(),...(cache[sort]||[])];render();state(wall.dataset.error);retry.hidden=false;return;}list=[...readLocal(),...(cache[sort]||[])];render();}},150);});
   phone.addEventListener('change',()=>{page=1;if(loaded)render();});
   if('ResizeObserver'in window)new ResizeObserver(placeArrows).observe(board);
   if('IntersectionObserver'in window){const io=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting)&&!loaded){io.disconnect();load();}},{rootMargin:'200px'});io.observe(wall);}else load();

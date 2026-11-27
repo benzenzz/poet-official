@@ -2,7 +2,7 @@
  * D1 access layer. All SQL lives here so route handlers stay I/O-light
  * and readable. Callers pass `env` (expects `env.DB`).
  */
-import { ADMIN_LIST_LIMIT, PUBLIC_WALL_LIMIT } from './config.js';
+import { ADMIN_LIST_LIMIT, PUBLIC_WALL_PAGE_SIZE } from './config.js';
 import { hashPassword, randomHex } from './crypto.js';
 
 /* -- settings -- */
@@ -153,9 +153,13 @@ export async function setPaymentLinkId(env, orderCode, paymentLinkId) {
     .run();
 }
 
-function publicListStatements(env, withGift, withBusiness, sort, withSticker = true) {
+function publicListStatements(env, withGift, withBusiness, sort, offset, withSticker = true) {
   // sort=amount uses idx_donations_success_amount (status, amount).
-  const order = sort === 'amount' ? 'amount DESC, paid_at DESC' : 'paid_at DESC';
+  // order_code is a private, unique tie-breaker so offset pagination is stable
+  // when multiple donations share the same paid_at timestamp.
+  const order = sort === 'amount'
+    ? 'amount DESC, paid_at DESC, order_code DESC'
+    : 'paid_at DESC, order_code DESC';
   const statements = [
     env.DB.prepare(
       `SELECT display_name AS displayName,
@@ -164,8 +168,8 @@ function publicListStatements(env, withGift, withBusiness, sort, withSticker = t
        FROM donations
        WHERE status = 'success'
        ORDER BY ${order}
-       LIMIT ${PUBLIC_WALL_LIMIT}`,
-    ),
+       LIMIT ${PUBLIC_WALL_PAGE_SIZE} OFFSET ?`,
+    ).bind(offset),
     env.DB.prepare(
       // business_count is the number typed in /admin, not derived from the ledger.
       `SELECT COALESCE(SUM(amount), 0) AS totalAmount, COUNT(*) AS totalCount,
@@ -187,7 +191,7 @@ function publicListStatements(env, withGift, withBusiness, sort, withSticker = t
   return statements;
 }
 
-export async function listPublicDonations(env, sort = 'new') {
+export async function listPublicDonations(env, sort = 'new', offset = 0) {
   // One round trip for every query. idx_donations_success_amount makes the
   // SUM/COUNT an index-only scan instead of reading whole donation rows.
   // Falls back progressively: pre-0004 columns when the gift migration is not
@@ -202,7 +206,7 @@ export async function listPublicDonations(env, sort = 'new') {
   for (let attempt = 0; attempt < 4; attempt++) {
     try {
       [list, totals, businessRow] = await env.DB.batch(
-        publicListStatements(env, withGift, withBusiness, sort, withSticker),
+        publicListStatements(env, withGift, withBusiness, sort, offset, withSticker),
       );
       break;
     } catch (err) {

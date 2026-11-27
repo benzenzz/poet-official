@@ -5,10 +5,10 @@ import { handleAdminList } from '../src/routes-admin.js';
 import worker from '../src/index.js';
 
 function fakeEnv() {
-  const log = [];
+  const log = [], bindings = [];
   const stmt = (sql) => ({
     sql, args: [],
-    bind(...a) { this.args = a; return this; },
+    bind(...a) { this.args = a; bindings.push({ sql, args: a }); return this; },
     async first() { log.push(sql); return { totalReceived: 0, receivedCount: 0 }; },
     async all() { log.push(sql); return { results: [{ orderCode: 1, hidden: 1 }] }; },
     async run() { log.push(sql); return { meta: { changes: 0 } }; },
@@ -20,7 +20,7 @@ function fakeEnv() {
       return [{ results: [] }, { results: [{ totalAmount: 0, totalCount: 0 }] }];
     },
   };
-  return { env: { DB, PAYOS_CHECKSUM_KEY: 'k', ALLOWED_ORIGIN: 'https://maiphh.github.io' }, log };
+  return { env: { DB, PAYOS_CHECKSUM_KEY: 'k', ALLOWED_ORIGIN: 'https://maiphh.github.io' }, log, bindings };
 }
 const norm = (s) => s.replace(/\s+/g, ' ');
 
@@ -32,7 +32,7 @@ describe('public wall sort param', () => {
     // Wall list + wall totals + business aggregate, one D1 batch.
     assert.equal(log.length, 3);
     assert.match(norm(log[0]), /CASE WHEN hidden = 1 THEN '' ELSE message END/);
-    assert.match(norm(log[0]), /ORDER BY paid_at DESC LIMIT 30/);
+    assert.match(norm(log[0]), /ORDER BY paid_at DESC, order_code DESC LIMIT 30 OFFSET \?/);
     assert.match(norm(log[2]), /FROM business_deals WHERE status = 'received'/);
   });
   it('sort=amount orders by amount DESC with same limit, hidden still blanked', async () => {
@@ -40,9 +40,24 @@ describe('public wall sort param', () => {
     const res = await handleListPublic(env, null, new URL('http://w/api/donations?sort=amount'));
     assert.equal(res.status, 200);
     assert.equal(log.length, 3);
-    assert.match(norm(log[0]), /WHERE status = 'success' ORDER BY amount DESC, paid_at DESC LIMIT 30/);
+    assert.match(norm(log[0]), /WHERE status = 'success' ORDER BY amount DESC, paid_at DESC, order_code DESC LIMIT 30 OFFSET \?/);
     assert.match(norm(log[0]), /CASE WHEN hidden = 1 THEN '' ELSE message END/);
   });
+  it('offset loads the next 30-row window using a bound parameter', async () => {
+    const { env, log, bindings } = fakeEnv();
+    const res = await handleListPublic(env, null, new URL('http://w/api/donations?offset=30'));
+    assert.equal(res.status, 200);
+    assert.match(norm(log[0]), /ORDER BY paid_at DESC, order_code DESC LIMIT 30 OFFSET \?/);
+    assert.deepEqual(bindings[0].args, [30]);
+  });
+  for (const offset of ['-1', '1.5', 'not-a-number', '9007199254740992']) {
+    it(`offset=${JSON.stringify(offset)} -> 400 without a database read`, async () => {
+      const { env, log } = fakeEnv();
+      const res = await handleListPublic(env, null, new URL('http://w/api/donations?offset=' + encodeURIComponent(offset)));
+      assert.equal(res.status, 400);
+      assert.equal(log.length, 0);
+    });
+  }
   for (const bad of ['AMOUNT', 'amount;drop', 'old', '']) {
     it(`sort=${JSON.stringify(bad)} -> ${bad === '' ? 200 : 400}, no reads on 400`, async () => {
       const { env, log } = fakeEnv();
